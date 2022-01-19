@@ -7,6 +7,7 @@
  */
 
 #include <utils/log.h>
+#include <utils/utils.h>
 
 #include <chrono>
 #include <cstdlib>

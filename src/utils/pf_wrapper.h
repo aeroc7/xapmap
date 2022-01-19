@@ -6,9 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "log.h"
+#ifndef PF_WRAPPER_H_
+#define PF_WRAPPER_H_
+
+#include <string>
 
 namespace utils {
-Logger log{std::cout};
-Logger log_err{std::cerr};
+long gettime_highres();
+long gettime_seconds();
+std::string formatted_logtime();
 }  // namespace utils
+
+#endif /* PF_WRAPPER_H_ */

@@ -49,6 +49,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_standalone
         project_options
         project_warnings
         project_libraries
+        Threads::Threads
         GL
         cairo
         freetype
