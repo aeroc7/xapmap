@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(zapmap CXX)
+project(xapmap CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 

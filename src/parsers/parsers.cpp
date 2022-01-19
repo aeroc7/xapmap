@@ -6,18 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <cstdlib>
+#include "parsers.h"
 
-#include "xapmap.h"
-
-using namespace xapmap;
-
-namespace {
-std::unique_ptr<Xapmap> xap_map;
-}
-
-int main() {
-    xap_map = std::make_unique<Xapmap>();
-    xap_map.reset();
-    return EXIT_SUCCESS;
-}
+namespace xapmap::parsers {
+Parsers::Parsers() { thread = std::thread(&Parsers::thread_func, this); }
+void Parsers::thread_func() {}
+Parsers::~Parsers() { thread.join(); }
+}  // namespace xapmap::parsers
