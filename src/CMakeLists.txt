@@ -2,16 +2,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Source file storage
 add_library(project_source INTERFACE)
 
-# Add subdirectories here that append source files to the 'library' above.
+# Include util directory
+target_include_directories(project_source INTERFACE "${CMAKE_CURRENT_LIST_DIR}/")
 
-# Ex:
-# add_subdirectory(util)
-#
-# -> Inside util directory "CMakeLists.txt" file
-#
-#    target_sources(project_source INTERFACE
-#      ${CMAKE_CURRENT_LIST_DIR}/log.cpp
-#    )
+add_subdirectory(utils)
 
 # Standalone executable
 add_executable(${CMAKE_PROJECT_NAME}_standalone main.cpp)
@@ -28,7 +22,10 @@ else()
 endif()
 
 # Various library definitions
-target_compile_definitions(project_options INTERFACE -DGLEW_STATIC -DM_PI=3.1415926535897932)
+target_compile_definitions(project_options INTERFACE
+    -DGLEW_STATIC
+    -DM_PI=3.1415926535897932
+    -DLOGGER_HEADER="${CMAKE_PROJECT_NAME}")
 
 if(WIN32)
     target_link_libraries(project_libraries

@@ -6,9 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <utils/log.h>
+#include "log.h"
 
-#include <chrono>
-#include <cstdlib>
-
-int main() { return EXIT_SUCCESS; }
+namespace utils {
+Logger log;
+}
