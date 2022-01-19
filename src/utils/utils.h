@@ -15,6 +15,7 @@
     do {                                               \
         if ((x) != 0) [[unlikely]] {                   \
             utils::Log() << #x << " did not return 0"; \
+            std::abort();                              \
         }                                              \
     } while (0)
 
