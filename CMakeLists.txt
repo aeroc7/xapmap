@@ -4,6 +4,18 @@ project(xapmap CXX)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
+# Restrict compiler to not use GCC (at least for now)
+# In short, GCC uses unique symbols to prevent conflict
+# with certain global constants in a particular library.
+# This in turn can prevent dlclose() from being called,
+# and we NEED that to be called for our plugin to get a
+# reload without completely restarting X-Plane
+if(UNIX AND NOT APPLE)
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        message(FATAL_ERROR "GCC compiler not supported")
+    endif()
+endif()
+
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_20)
 
