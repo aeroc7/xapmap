@@ -10,18 +10,15 @@
 #define LOG_H_
 
 #include <iostream>
-#include <source_location>
 
 #include "pf_wrapper.h"
 
 namespace utils {
 class Log {
 public:
-    Log(std::ostream &os = std::cout,
-        const std::source_location &loc = std::source_location::current())
-        : out_log(os) {
-        out_log << LOGGER_HEADER << ' ' << formatted_logtime() << " ["
-                << filename_split(loc.file_name()) << ':' << loc.line() << "]: ";
+    Log(std::ostream &os = std::cout) : out_log(os) {
+        out_log << LOGGER_HEADER << ' ' << formatted_logtime() << " [" << filename_split(__FILE__)
+                << ':' << __LINE__ << "]: ";
     }
 
     ~Log() { out_log << '\n'; }
