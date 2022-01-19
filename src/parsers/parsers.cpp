@@ -8,8 +8,21 @@
 
 #include "parsers.h"
 
+#include <utils/log.h>
+
+#include "apt_dat.h"
+
 namespace xapmap::parsers {
 Parsers::Parsers() { thread = std::thread(&Parsers::thread_func, this); }
-void Parsers::thread_func() {}
+
+void Parsers::thread_func() {
+    try {
+        AptDat apt;
+        apt.parse(USER_XPLANE_ROOT);
+    } catch (const std::exception &e) {
+        utils::Log() << "Caught exception: " << e.what();
+    }
+}
+
 Parsers::~Parsers() { thread.join(); }
 }  // namespace xapmap::parsers
