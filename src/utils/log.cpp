@@ -9,5 +9,6 @@
 #include "log.h"
 
 namespace utils {
-Logger log;
-}
+Logger log{std::cout};
+Logger log_err{std::cerr};
+}  // namespace utils
