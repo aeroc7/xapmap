@@ -6,6 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <utils/log.h>
+
 #include <cstdlib>
 
 #include "xapmap.h"
@@ -17,7 +19,13 @@ std::unique_ptr<Xapmap> xap_map;
 }
 
 int main() {
-    xap_map = std::make_unique<Xapmap>();
-    xap_map.reset();
+    try {
+        xap_map = std::make_unique<Xapmap>();
+        xap_map.reset();
+    } catch (const std::exception &e) {
+        utils::Log() << "Caught exception: " << e.what();
+    } catch (...) {
+    }
+
     return EXIT_SUCCESS;
 }
