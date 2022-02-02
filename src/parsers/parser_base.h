@@ -55,16 +55,16 @@ public:
         bool was_char = false;
         const char *data = line.c_str();
 
-        for (size_t i = 0; i < strlen(data); ++i) {
+        for (std::size_t i = 0; i < std::strlen(data); ++i) {
             if (ctr == index) {
-                if (isspace(data[i])) {
+                if (std::isspace(data[i])) {
                     continue;
                 }
 
                 return std::string(data + i);
             }
 
-            const bool is_space = isspace(data[i]);
+            const bool is_space = std::isspace(data[i]);
 
             if (is_space && was_char) {
                 ctr += 1;
