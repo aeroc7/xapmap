@@ -6,17 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef XAPMAP_H_
-#define XAPMAP_H_
+#ifndef APT_DAT_H_
+#define APT_DAT_H_
 
-#include "parsers/parse_hdlr.h"
+#include <string>
 
-namespace xapmap {
-class Xapmap {
+namespace parsers {
+class ParseAptDat {
 public:
+    ParseAptDat(const std::string &path);
 private:
-    parsers::ParseHdlr phdlr;
 };
-}  // namespace xapmap
+}
 
-#endif /* XAPMAP_H_ */
+#endif /* APT_DAT_H_ */

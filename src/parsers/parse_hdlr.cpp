@@ -6,17 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef XAPMAP_H_
-#define XAPMAP_H_
+#include "parse_hdlr.h"
 
-#include "parsers/parse_hdlr.h"
+#include "apt_dat.h"
 
-namespace xapmap {
-class Xapmap {
-public:
-private:
-    parsers::ParseHdlr phdlr;
-};
-}  // namespace xapmap
-
-#endif /* XAPMAP_H_ */
+namespace parsers {
+ParseHdlr::ParseHdlr() {
+    apt_dat_hdlr = std::make_unique<ParseAptDat>("/home/bennett/X-Plane 11/Custom Scenery/");
+}
+}  // namespace parsers

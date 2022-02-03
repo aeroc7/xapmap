@@ -13,10 +13,12 @@
 #include <iostream>
 
 #include "pf_wrapper.h"
+#include "str_utils.h"
 
 namespace utils {
 struct SourceLocation {
-    constexpr SourceLocation(const char *f, uint_least32_t l) : filename(f), line(l) {
+    constexpr SourceLocation(const char *f, const char *func, uint_least32_t l)
+        : filename(f), function(func), line(l) {
     }
     constexpr const char *get_filename() const noexcept {
         return filename;
@@ -24,18 +26,23 @@ struct SourceLocation {
     constexpr uint_least32_t get_line() const noexcept {
         return line;
     }
+    constexpr const char *get_function() const noexcept {
+        return function;
+    }
 
     static constexpr SourceLocation current(
 #if defined(__clang__) || defined(__GNUC__)
-        const char *fileName = __builtin_FILE(), uint_least32_t line = __builtin_LINE()) noexcept {
+        const char *fileName = __builtin_FILE(), const char *functionName = __builtin_FUNCTION(),
+        uint_least32_t line = __builtin_LINE()) noexcept {
 #else
 #error "unsupported";
 #endif
-        return SourceLocation(fileName, line);
+        return SourceLocation(fileName, functionName, line);
     }
 
 private:
     const char *filename;
+    const char *function;
     uint_least32_t line;
 };
 
@@ -68,14 +75,6 @@ private:
             case LogType::Error:
                 return std::cerr;
         }
-    }
-
-    constexpr std::string_view filename_split(std::string_view path) const noexcept {
-        const std::size_t last_path_sep = [&path] {
-            const auto ps = path.find_last_of("/");
-            return (ps == std::string::npos ? 0 : (ps + 1));
-        }();
-        return std::string_view(path.data() + last_path_sep, path.length() - last_path_sep);
     }
 
     std::ostream &out_log;
