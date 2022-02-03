@@ -6,7 +6,6 @@ add_library(project_source INTERFACE)
 target_include_directories(project_source INTERFACE "${CMAKE_CURRENT_LIST_DIR}/")
 
 add_subdirectory(utils)
-add_subdirectory(parsers)
 
 # Standalone executable
 add_executable(${CMAKE_PROJECT_NAME}_standalone main.cpp xapmap.cpp)

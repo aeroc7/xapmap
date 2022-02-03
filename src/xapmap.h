@@ -9,18 +9,10 @@
 #ifndef XAPMAP_H_
 #define XAPMAP_H_
 
-#include <memory>
-
-#include "parsers/parsers.h"
-
 namespace xapmap {
 class Xapmap {
 public:
-    Xapmap();
-    ~Xapmap();
-
 private:
-    std::unique_ptr<parsers::Parsers> parser_hdlr;
 };
 }  // namespace xapmap
 

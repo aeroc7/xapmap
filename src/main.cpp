@@ -9,6 +9,7 @@
 #include <utils/log.h>
 
 #include <cstdlib>
+#include <memory>
 
 #include "xapmap.h"
 

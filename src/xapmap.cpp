@@ -8,12 +8,4 @@
 
 #include "xapmap.h"
 
-namespace xapmap {
-Xapmap::Xapmap() {
-    parser_hdlr = std::make_unique<parsers::Parsers>();
-}
-
-Xapmap::~Xapmap() {
-    parser_hdlr.reset();
-}
-}  // namespace xapmap
+namespace xapmap {}  // namespace xapmap
