@@ -16,9 +16,14 @@
 
 namespace utils {
 struct SourceLocation {
-    constexpr SourceLocation(const char *f, uint_least32_t l) : filename(f), line(l) {}
-    constexpr const char *get_filename() const noexcept { return filename; }
-    constexpr uint_least32_t get_line() const noexcept { return line; }
+    constexpr SourceLocation(const char *f, uint_least32_t l) : filename(f), line(l) {
+    }
+    constexpr const char *get_filename() const noexcept {
+        return filename;
+    }
+    constexpr uint_least32_t get_line() const noexcept {
+        return line;
+    }
 
     static constexpr SourceLocation current(
 #if defined(__clang__) || defined(__GNUC__)
@@ -46,7 +51,9 @@ public:
                 << filename_split(slc.get_filename()) << ':' << slc.get_line() << "]: ";
     }
 
-    ~Log() { out_log << '\n'; }
+    ~Log() {
+        out_log << '\n';
+    }
     template <typename T>
     std::ostream &operator<<(const T &msg) noexcept {
         out_log << msg;
