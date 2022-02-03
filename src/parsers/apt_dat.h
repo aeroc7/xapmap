@@ -34,7 +34,9 @@ private:
     void airport_start(const std::string &line);
     void airport_stop();
     void airport_datum(const std::string &line);
-    bool is_valid_apt() const noexcept { return ap_data.valid_apt; }
+    bool is_valid_apt() const noexcept {
+        return ap_data.valid_apt;
+    }
 
     struct {
         AptDatData cur_apt;

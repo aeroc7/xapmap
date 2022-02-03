@@ -6,14 +6,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "xapmap.h"
+#ifndef ERR_HELP_H_
+#define ERR_HELP_H_
 
-namespace xapmap {
-Xapmap::Xapmap() {
-    parser_hdlr = std::make_unique<parsers::Parsers>();
-}
+#include "log.h"
 
-Xapmap::~Xapmap() {
-    parser_hdlr.reset();
-}
-}  // namespace xapmap
+namespace utils {}
+
+#endif /* ERR_HELP_H_ */

@@ -13,7 +13,9 @@
 #include "apt_dat.h"
 
 namespace xapmap::parsers {
-Parsers::Parsers() { thread = std::thread(&Parsers::thread_func, this); }
+Parsers::Parsers() {
+    thread = std::thread(&Parsers::thread_func, this);
+}
 
 void Parsers::thread_func() {
     try {
@@ -24,5 +26,7 @@ void Parsers::thread_func() {
     }
 }
 
-Parsers::~Parsers() { thread.join(); }
+Parsers::~Parsers() {
+    thread.join();
+}
 }  // namespace xapmap::parsers

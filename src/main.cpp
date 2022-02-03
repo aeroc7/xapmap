@@ -13,6 +13,7 @@
 #include "xapmap.h"
 
 using namespace xapmap;
+using namespace utils;
 
 namespace {
 std::unique_ptr<Xapmap> xap_map;
@@ -21,11 +22,13 @@ std::unique_ptr<Xapmap> xap_map;
 int main() {
     try {
         xap_map = std::make_unique<Xapmap>();
-        xap_map.reset();
     } catch (const std::exception &e) {
-        utils::Log() << "Caught exception: " << e.what();
+        Log(Log::ERROR) << "Caught exception: " << e.what();
     } catch (...) {
+        Log(Log::ERROR) << "Caught unknown exception";
     }
+
+    xap_map.reset();
 
     return EXIT_SUCCESS;
 }

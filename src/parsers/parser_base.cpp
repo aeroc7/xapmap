@@ -31,5 +31,7 @@ void ParserBase::parse(std::string fn) {
     }
 }
 
-void ParserBase::cancel() { stop_parsing = true; }
+void ParserBase::cancel() {
+    stop_parsing = true;
+}
 }  // namespace xapmap::parsers
