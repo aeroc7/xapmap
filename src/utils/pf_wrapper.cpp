@@ -16,7 +16,7 @@ namespace utils {
 long gettime_highres() {
 #ifdef LIN
     struct timespec tp;
-    VRET0(clock_gettime(CLOCK_MONOTONIC, &tp));
+    VERIF0(clock_gettime(CLOCK_MONOTONIC, &tp));
     return (tp.tv_sec * 1000000000L) + tp.tv_nsec;
 #endif
 }
@@ -24,7 +24,7 @@ long gettime_highres() {
 long gettime_seconds() {
 #ifdef LIN
     struct timespec tp;
-    VRET0(clock_gettime(CLOCK_MONOTONIC, &tp));
+    VERIF0(clock_gettime(CLOCK_MONOTONIC, &tp));
     return tp.tv_sec;
 #endif
 }
