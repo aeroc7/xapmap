@@ -37,10 +37,22 @@ struct SourceLocation {
 #else
 #error "unsupported";
 #endif
-        return SourceLocation(fileName, functionName, line);
+        return SourceLocation(fix_filename_path(fileName), functionName, line);
     }
 
 private:
+    static constexpr const char *fix_filename_path(const char *fn) noexcept {
+        const auto fn_split = filename_split(fn);
+        const auto sz = fn_split.size();
+        auto fn_data = fn_split.data();
+
+        if (fn_data[sz] != '\0') {
+            fn_data = "invalid_path";
+        }
+
+        return fn_data;
+    }
+
     const char *filename;
     const char *function;
     uint_least32_t line;
@@ -54,8 +66,8 @@ public:
 
     Log(LogType logtype = INFO, SourceLocation slc = SourceLocation::current())
         : out_log(log_stream(logtype)) {
-        out_log << LOGGER_HEADER << ' ' << formatted_logtime() << " ["
-                << filename_split(slc.get_filename()) << ':' << slc.get_line() << "]: ";
+        out_log << LOGGER_HEADER << ' ' << formatted_logtime() << " [" << slc.get_filename() << ':'
+                << slc.get_line() << "]: ";
     }
 
     ~Log() {

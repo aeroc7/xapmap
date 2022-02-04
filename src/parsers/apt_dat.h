@@ -10,13 +10,16 @@
 #define APT_DAT_H_
 
 #include <string>
+#include <vector>
 
 namespace parsers {
 class ParseAptDat {
 public:
     ParseAptDat(const std::string &path);
+
 private:
+    std::vector<std::string> scenery_directories(const std::string &path) const;
 };
-}
+}  // namespace parsers
 
 #endif /* APT_DAT_H_ */
