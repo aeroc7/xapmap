@@ -28,6 +28,12 @@ public:
         ss_error err;
     };
 
+    static constexpr auto SPACE_DELIM = ' ';
+
+    static constexpr auto str_isspace(char c) noexcept {
+        return (c == SPACE_DELIM);
+    }
+
     // Returns string section from whitespace `index` to the end of the string
     static auto split_string_tend(const std::string &str, unsigned index) {
         using iter_add_type = std::string::difference_type;
@@ -39,8 +45,8 @@ public:
         }
 
         for (std::size_t i = 0; i < (len - 1); ++i) {
-            const auto cur_is_space = std::isspace(str[i]);
-            if (cur_is_space && !std::isspace(str[i + 1])) {
+            const auto cur_is_space = str_isspace(str[i]);
+            if (cur_is_space && !str_isspace(str[i + 1])) {
                 index_ctr += 1;
             }
 
@@ -66,8 +72,8 @@ public:
         }
 
         for (std::size_t i = 0; i < (len - 1); ++i) {
-            const auto cur_is_space = std::isspace(str[i]);
-            if (cur_is_space && !std::isspace(str[i + 1])) {
+            const auto cur_is_space = str_isspace(str[i]);
+            if (cur_is_space && !str_isspace(str[i + 1])) {
                 index_ctr += 1;
             }
 
@@ -75,11 +81,16 @@ public:
                 const std::string::const_iterator new_iter =
                     (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
                                   : str.begin() + static_cast<iter_add_type>(i));
-                const auto next_space_pos =
-                    std::find_if(new_iter, str.end(), [](std::string::value_type c) {
-                        return std::isspace(c);
-                    });
-                return ss_return{{new_iter, next_space_pos}, ss_error::success};
+                const auto next_space_pos = [&]() {
+                    std::string::const_iterator it;
+                    for (it = new_iter; it != str.end(); ++it) {
+                        if (str_isspace(*it)) {
+                            break;
+                        }
+                    }
+                    return it;
+                }();
+                return ss_return{std::string(new_iter, next_space_pos), ss_error::success};
             }
         }
 

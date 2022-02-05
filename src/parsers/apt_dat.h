@@ -10,15 +10,30 @@
 #define APT_DAT_H_
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace parsers {
+struct CoordPair {
+    double lat;
+    double lon;
+};
+
+struct AirportData {
+    std::string icao;
+    std::string city;
+    std::string state;
+    CoordPair coords;
+};
 class ParseAptDat {
 public:
     ParseAptDat(const std::string &path);
 
 private:
     std::vector<std::string> scenery_directories(const std::string &path) const;
+    void parse_apt_dat_file(const std::string &e);
+
+    std::unordered_map<std::string, AirportData> airport_db;
 };
 }  // namespace parsers
 

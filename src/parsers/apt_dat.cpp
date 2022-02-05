@@ -15,7 +15,6 @@
 #include <chrono>
 #include <exception>
 #include <fstream>
-#include <functional>
 
 using namespace utils;
 
@@ -50,16 +49,20 @@ private:
     std::string msg;
 };
 
+static inline void only_raise_info(const ParseError &e) {
+    Log(Log::ERROR) << "Parse error: " << e.what();
+}
+
+struct LrCbParam {
+    const std::string &line;
+    std::size_t line_num;
+    const std::string &filename;
+};
+
+template <typename Lambda>
 class FileLineReader {
 public:
-    struct CbParam {
-        const std::string &line;
-        std::size_t line_num;
-        const std::string &filename;
-    };
-
-    using cb_signature = void(const CbParam &p);
-    FileLineReader(const std::string &path, std::function<cb_signature> cb_on_line)
+    FileLineReader(const std::string &path, Lambda cb_on_line)
         : on_line(cb_on_line), file_basename(filename_split(path)) {
         read_file(path);
     }
@@ -77,7 +80,7 @@ private:
 
         while (std::getline(file, line_buf)) {
             line_counter += 1;
-            on_line({line_buf, line_counter, this->file_basename});
+            on_line(LrCbParam{line_buf, line_counter, this->file_basename});
         }
 
         if (file.eof()) {
@@ -89,31 +92,41 @@ private:
         }
     }
 
-    std::function<cb_signature> on_line;
+    Lambda on_line;
     static constexpr std::size_t LINE_BUF_SIZE_INIT = 1024;
     std::string file_basename;
 };
 
 ParseAptDat::ParseAptDat(const std::string &path) {
-    [[maybe_unused]] const auto sd = scenery_directories(path);
+    const auto sd = scenery_directories(path);
+
+    for (int i = 0; i < 10; ++i) {
+        for (const auto &e : sd) {
+            parse_apt_dat_file(e);
+        }
+    }
 }
 
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
-    std::vector<std::string> file_paths{15};
-    FileLineReader(path + "scenery_packs.ini", [&](const FileLineReader::CbParam &p) {
+    std::vector<std::string> file_paths;
+    file_paths.reserve(15);
+
+    FileLineReader(path + "scenery_packs.ini", [&](const LrCbParam &p) {
         const auto row_item = str::split_string(p.line, 0);
 
         if (row_item.str == "SCENERY_PACK") {
             const auto file_loc = str::split_string_tend(p.line, 1);
             switch (file_loc.err) {
                 case str::ss_error::out_of_range:
-                    throw ParseError(
-                        "Attempted string split to end is out of range (line contents: '" + p.line +
+                    only_raise_info(ParseError(
+                        "Attempted string split-to-end is out of range (line contents: '" + p.line +
                             "')",
-                        p.filename, p.line_num);
+                        p.filename, p.line_num));
+                    return;
                 case str::ss_error::str_empty:
-                    throw ParseError(
-                        "Tried to extract pathname but it was empty", p.filename, p.line_num);
+                    only_raise_info(ParseError(
+                        "Tried to extract pathname but it was empty", p.filename, p.line_num));
+                    return;
                 case str::ss_error::success:
                     break;
             }
@@ -122,5 +135,18 @@ std::vector<std::string> ParseAptDat::scenery_directories(const std::string &pat
         }
     });
     return file_paths;
+}
+
+void ParseAptDat::parse_apt_dat_file(const std::string &file) {
+    std::size_t ap_ctr{};
+    FileLineReader("/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat",
+        [&ap_ctr](const LrCbParam &p) {
+            const auto row_code = str::split_string(p.line, 0);
+            if (row_code.str == "1302") {
+                ap_ctr += 1;
+            }
+        });
+
+    Log() << ap_ctr;
 }
 }  // namespace parsers
