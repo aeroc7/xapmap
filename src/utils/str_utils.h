@@ -20,36 +20,72 @@ constexpr std::string_view filename_split(std::string_view path) noexcept {
     return std::string_view(path.data() + last_path_sep, path.length() - last_path_sep);
 }
 
-inline auto split_string(const std::string &str, unsigned index) {
-    using iter_add_type = std::string::difference_type;
-    const auto len = str.length();
-    unsigned index_ctr = 0;
-
-    struct split_string_return {
+class str {
+public:
+    enum class ss_error { out_of_range, str_empty, success };
+    struct ss_return {
         std::string str;
-        bool success;
+        ss_error err;
     };
 
-    for (std::size_t i = 0; i < (len - 1); ++i) {
-        const auto cur_is_space = std::isspace(str[i]);
-        if (cur_is_space && !std::isspace(str[i + 1])) {
-            index_ctr += 1;
+    // Returns string section from whitespace `index` to the end of the string
+    static auto split_string_tend(const std::string &str, unsigned index) {
+        using iter_add_type = std::string::difference_type;
+        const auto len = str.length();
+        unsigned index_ctr = 0;
+
+        if (len == 0) {
+            return ss_return{{}, ss_error::str_empty};
         }
 
-        if (index_ctr == index) {
-            std::string::const_iterator new_iter =
-                (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
-                              : str.begin() + static_cast<iter_add_type>(i));
-            const auto next_space_pos =
-                std::find_if(new_iter, str.end(), [](std::string::value_type c) {
-                    return std::isspace(c);
-                });
-            return split_string_return{{new_iter, next_space_pos}, true};
+        for (std::size_t i = 0; i < (len - 1); ++i) {
+            const auto cur_is_space = std::isspace(str[i]);
+            if (cur_is_space && !std::isspace(str[i + 1])) {
+                index_ctr += 1;
+            }
+
+            if (index_ctr == index) {
+                const std::string::const_iterator new_iter =
+                    (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
+                                  : str.begin() + static_cast<iter_add_type>(i));
+                return ss_return{{new_iter, str.end()}, ss_error::success};
+            }
         }
+
+        return ss_return{{}, ss_error::out_of_range};
     }
 
-    return split_string_return{{}, false};
-}
+    // Returns string token at whitespace `index`.
+    static auto split_string(const std::string &str, unsigned index) {
+        using iter_add_type = std::string::difference_type;
+        const auto len = str.length();
+        unsigned index_ctr = 0;
+
+        if (len == 0) {
+            return ss_return{{}, ss_error::str_empty};
+        }
+
+        for (std::size_t i = 0; i < (len - 1); ++i) {
+            const auto cur_is_space = std::isspace(str[i]);
+            if (cur_is_space && !std::isspace(str[i + 1])) {
+                index_ctr += 1;
+            }
+
+            if (index_ctr == index) {
+                const std::string::const_iterator new_iter =
+                    (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
+                                  : str.begin() + static_cast<iter_add_type>(i));
+                const auto next_space_pos =
+                    std::find_if(new_iter, str.end(), [](std::string::value_type c) {
+                        return std::isspace(c);
+                    });
+                return ss_return{{new_iter, next_space_pos}, ss_error::success};
+            }
+        }
+
+        return ss_return{{}, ss_error::out_of_range};
+    }
+};
 }  // namespace utils
 
 #endif /* STR_UTILS_H_ */
