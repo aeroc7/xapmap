@@ -24,21 +24,31 @@ class str {
 public:
     enum class ss_error { out_of_range, str_empty, success };
     struct ss_return {
-        std::string str;
+        std::string_view str;
         ss_error err;
     };
 
     static constexpr auto SPACE_DELIM = ' ';
 
-    static constexpr auto str_isspace(char c) noexcept {
-        return (c == SPACE_DELIM);
+    template <typename CharType>
+    static constexpr auto str_isspace(CharType chr) noexcept {
+        switch (chr) {
+            case ' ':
+            case '\f':
+            case '\n':
+            case '\r':
+            case '\t':
+            case '\v':
+                return true;
+            default:
+                return false;
+        }
     }
 
     // Returns string section from whitespace `index` to the end of the string
-    static auto split_string_tend(const std::string &str, unsigned index) {
-        using iter_add_type = std::string::difference_type;
+    static constexpr auto split_string_tend_sv(std::string_view str, unsigned index) noexcept {
         const auto len = str.length();
-        unsigned index_ctr = 0;
+        std::size_t index_ctr = 0;
 
         if (len == 0) {
             return ss_return{{}, ss_error::str_empty};
@@ -51,9 +61,8 @@ public:
             }
 
             if (index_ctr == index) {
-                const std::string::const_iterator new_iter =
-                    (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
-                                  : str.begin() + static_cast<iter_add_type>(i));
+                const std::string_view::const_iterator new_iter =
+                    (cur_is_space ? (str.begin() + (i + 1)) : (str.begin() + i));
                 return ss_return{{new_iter, str.end()}, ss_error::success};
             }
         }
@@ -62,10 +71,9 @@ public:
     }
 
     // Returns string token at whitespace `index`.
-    static auto split_string(const std::string &str, unsigned index) {
-        using iter_add_type = std::string::difference_type;
+    static constexpr auto split_string_sv(std::string_view str, unsigned index) noexcept {
         const auto len = str.length();
-        unsigned index_ctr = 0;
+        std::size_t index_ctr{};
 
         if (len == 0) {
             return ss_return{{}, ss_error::str_empty};
@@ -78,11 +86,9 @@ public:
             }
 
             if (index_ctr == index) {
-                const std::string::const_iterator new_iter =
-                    (cur_is_space ? (str.begin() + static_cast<iter_add_type>(i + 1))
-                                  : str.begin() + static_cast<iter_add_type>(i));
+                const auto new_iter = (cur_is_space ? (str.begin() + (i + 1)) : (str.begin() + i));
                 const auto next_space_pos = [&]() {
-                    std::string::const_iterator it;
+                    const char *it;
                     for (it = new_iter; it != str.end(); ++it) {
                         if (str_isspace(*it)) {
                             break;
@@ -90,11 +96,15 @@ public:
                     }
                     return it;
                 }();
-                return ss_return{std::string(new_iter, next_space_pos), ss_error::success};
+                return ss_return{{new_iter, next_space_pos}, ss_error::success};
             }
         }
 
         return ss_return{{}, ss_error::out_of_range};
+    }
+
+    static constexpr bool cmp_equal_sv(std::string_view s1, std::string_view s2) noexcept {
+        return (s1 == s2);
     }
 };
 }  // namespace utils

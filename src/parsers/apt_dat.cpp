@@ -15,6 +15,7 @@
 #include <chrono>
 #include <exception>
 #include <fstream>
+#include <typeinfo>
 
 using namespace utils;
 
@@ -49,15 +50,38 @@ private:
     std::string msg;
 };
 
-static inline void only_raise_info(const ParseError &e) {
-    Log(Log::ERROR) << "Parse error: " << e.what();
-}
-
 struct LrCbParam {
     const std::string &line;
     std::size_t line_num;
     const std::string &filename;
 };
+
+static inline void only_raise_info(const ParseError &e) {
+    Log(Log::ERROR) << "Parse error: " << e.what();
+}
+
+template <typename T>
+static T num_from_str(std::string_view str, const LrCbParam &p) {
+    T out_val;
+    const auto [ptr, ec] = std::from_chars<T>(str.begin(), str.end(), out_val);
+
+    switch (ec) {
+        case std::errc::invalid_argument:
+            only_raise_info(
+                ParseError("Failed to convert '" + std::string(str) + "' to numerical type.",
+                    p.filename, p.line_num));
+            break;
+        case std::errc::result_out_of_range:
+            only_raise_info(ParseError("The number " + std::string(str) +
+                                           " is out of range for the type " + typeid(T).name(),
+                p.filename, p.line_num));
+            break;
+        default:
+            break;
+    }
+
+    return out_val;
+}
 
 template <typename Lambda>
 class FileLineReader {
@@ -80,7 +104,8 @@ private:
 
         while (std::getline(file, line_buf)) {
             line_counter += 1;
-            on_line(LrCbParam{line_buf, line_counter, this->file_basename});
+            on_line(LrCbParam{
+                .line = line_buf, .line_num = line_counter, .filename = this->file_basename});
         }
 
         if (file.eof()) {
@@ -100,22 +125,19 @@ private:
 ParseAptDat::ParseAptDat(const std::string &path) {
     const auto sd = scenery_directories(path);
 
-    for (int i = 0; i < 10; ++i) {
-        for (const auto &e : sd) {
-            parse_apt_dat_file(e);
-        }
+    for (const auto &e : sd) {
+        parse_apt_dat_file(e);
     }
 }
 
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
     std::vector<std::string> file_paths;
-    file_paths.reserve(15);
 
     FileLineReader(path + "scenery_packs.ini", [&](const LrCbParam &p) {
-        const auto row_item = str::split_string(p.line, 0);
+        const auto row_item = str::split_string_sv(p.line, 0);
 
         if (row_item.str == "SCENERY_PACK") {
-            const auto file_loc = str::split_string_tend(p.line, 1);
+            const auto file_loc = str::split_string_tend_sv(p.line, 1);
             switch (file_loc.err) {
                 case str::ss_error::out_of_range:
                     only_raise_info(ParseError(
@@ -131,22 +153,24 @@ std::vector<std::string> ParseAptDat::scenery_directories(const std::string &pat
                     break;
             }
 
-            file_paths.push_back(std::move(file_loc.str));
+            file_paths.push_back(std::string{file_loc.str});
         }
     });
+
     return file_paths;
 }
 
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {
-    std::size_t ap_ctr{};
-    FileLineReader("/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat",
-        [&ap_ctr](const LrCbParam &p) {
-            const auto row_code = str::split_string(p.line, 0);
-            if (row_code.str == "1302") {
-                ap_ctr += 1;
+    FileLineReader(
+        "/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat", [this](const LrCbParam &p) {
+            const auto row_code_str = str::split_string_sv(p.line, 0);
+
+            if (str::cmp_equal_sv(row_code_str.str, "1")) {
+                AirportData tmp;
+                tmp.icao = str::split_string_sv(p.line, 4).str;
+                tmp.city = str::split_string_tend_sv(p.line, 5).str;
+                airport_db[tmp.icao] = tmp;
             }
         });
-
-    Log() << ap_ctr;
 }
 }  // namespace parsers
