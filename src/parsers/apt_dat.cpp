@@ -50,12 +50,6 @@ private:
     std::string msg;
 };
 
-struct LrCbParam {
-    const std::string &line;
-    std::size_t line_num;
-    const std::string &filename;
-};
-
 static inline void only_raise_info(const ParseError &e) {
     Log(Log::ERROR) << "Parse error: " << e.what();
 }
@@ -81,6 +75,31 @@ static T num_from_str(std::string_view str, const LrCbParam &p) {
     }
 
     return out_val;
+}
+
+static bool sv_check_good(const str::ss_return &s, const LrCbParam &p) {
+    using cu_str_err = str::ss_error;
+    switch (s.err) {
+        case cu_str_err::out_of_range:
+            only_raise_info(
+                ParseError("Index-string-length mismatch (out of range)", p.filename, p.line_num));
+            return false;
+        case cu_str_err::str_empty:
+            only_raise_info(ParseError("String was empty", p.filename, p.line_num));
+            return false;
+        case cu_str_err::success:
+        default:
+            return true;
+    }
+}
+
+static inline std::string_view set_default_str_ne(
+    const str::ss_return &str_val, const LrCbParam &p) {
+    if (sv_check_good(str_val, p)) {
+        return str_val.str;
+    }
+
+    return "";
 }
 
 template <typename Lambda>
@@ -128,6 +147,11 @@ ParseAptDat::ParseAptDat(const std::string &path) {
     for (const auto &e : sd) {
         parse_apt_dat_file(e);
     }
+
+    std::cout << airport_db["KSEA"].city << '\n';
+    std::cout << airport_db["KSEA"].state << '\n';
+    std::cout << airport_db["KSEA"].name << '\n';
+    std::cout << airport_db["KSEA"].icao << '\n';
 }
 
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
@@ -160,16 +184,49 @@ std::vector<std::string> ParseAptDat::scenery_directories(const std::string &pat
     return file_paths;
 }
 
+void ParseAptDat::cur_apt_start(const LrCbParam &p) {
+    const auto icao_str = str::split_string_sv(p.line, 4);
+    const auto ap_name_str = str::split_string_tend_sv(p.line, 5);
+
+    cur_apt.icao = set_default_str_ne(icao_str, p);
+    cur_apt.name = set_default_str_ne(ap_name_str, p);
+}
+
+void ParseAptDat::cur_apt_end(const LrCbParam &) {
+    if (str::cmp_equal_sv(cur_apt.icao.c_str(), "") == false) {
+        airport_db[cur_apt.icao] = cur_apt;
+    }
+
+    cur_apt = {};
+}
+
+void ParseAptDat::cur_apt_1302(const LrCbParam &p) {
+    const auto data_category = str::split_string_sv(p.line, 1);
+
+    auto split_after_safe = [](const LrCbParam &pline, unsigned index) {
+        const auto split_val = str::split_string_tend_sv(pline.line, index);
+        return set_default_str_ne(split_val, pline);
+    };
+
+    if (str::cmp_equal_sv(data_category.str, "city")) {
+        cur_apt.city = split_after_safe(p, 2);
+    } else if (str::cmp_equal_sv(data_category.str, "state")) {
+        cur_apt.state = split_after_safe(p, 2);
+    }
+}
+
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {
     FileLineReader(
         "/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat", [this](const LrCbParam &p) {
             const auto row_code_str = str::split_string_sv(p.line, 0);
 
             if (str::cmp_equal_sv(row_code_str.str, "1")) {
-                AirportData tmp;
-                tmp.icao = str::split_string_sv(p.line, 4).str;
-                tmp.city = str::split_string_tend_sv(p.line, 5).str;
-                airport_db[tmp.icao] = tmp;
+                cur_apt_end(p);
+                cur_apt_start(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "1302")) {
+                cur_apt_1302(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "99")) {
+                cur_apt_end(p);
             }
         });
 }
