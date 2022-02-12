@@ -22,6 +22,6 @@ auto from_chars(const char *first, const char *last, T &value) noexcept {
         return std::from_chars<T>(first, last, value);
     }
 }
-}
+}  // namespace utils
 
-#endif  /* FROM_CHARS_FULL_H_ */
+#endif /* FROM_CHARS_FULL_H_ */

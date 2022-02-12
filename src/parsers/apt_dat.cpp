@@ -8,12 +8,10 @@
 
 #include "apt_dat.h"
 
+#include <utils/from_chars_full.h>
 #include <utils/log.h>
 #include <utils/str_utils.h>
-#include <utils/from_chars_full.h>
 
-#include <charconv>
-#include <chrono>
 #include <exception>
 #include <fstream>
 #include <typeinfo>
@@ -58,6 +56,16 @@ static inline void only_raise_info(const ParseError &e) {
 template <typename T>
 static T num_from_str(std::string_view str, const LrCbParam &p) {
     T out_val;
+
+    // Unlike C's `atof` (and some other implementations), a leading '+' is not allowed.
+    // As from_chars implementations do not ignore leading whitespace, if there
+    // is a '+', it will be the first character. Filter it out so it doesn't return
+    // as a parse error.
+
+    if (str[0] == '+') {
+        str.remove_prefix(1);
+    }
+
     const auto [ptr, ec] = utils::from_chars<T>(str.begin(), str.end(), out_val);
 
     switch (ec) {
@@ -208,6 +216,10 @@ void ParseAptDat::cur_apt_1302(const LrCbParam &p) {
         cur_apt.city = split_after_safe(p, 2);
     } else if (str::cmp_equal_sv(data_category.str, "state")) {
         cur_apt.state = split_after_safe(p, 2);
+    } else if (str::cmp_equal_sv(data_category.str, "datum_lat")) {
+        cur_apt.coords.lat = num_from_str<double>(split_after_safe(p, 2), p);
+    } else if (str::cmp_equal_sv(data_category.str, "datum_lon")) {
+        cur_apt.coords.lon = num_from_str<double>(split_after_safe(p, 2), p);
     }
 }
 
