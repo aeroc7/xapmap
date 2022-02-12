@@ -19,12 +19,22 @@ struct CoordPair {
     double lon;
 };
 
+// Info for an airport runway. Respective ends have different coords, name.
+// Overall width is the same, as it's the same pavement, just opposite ends.
+struct AirportRunwayData {
+    double width;
+    std::array<char, 4> name[2];
+    CoordPair latitude[2];
+    CoordPair longitude[2];
+};
+
 struct AirportData {
     std::string icao;
     std::string name;
     std::string city;
     std::string state;
     CoordPair coords;
+    std::vector<AirportRunwayData> runways;
 };
 
 struct LrCbParam {
@@ -44,6 +54,7 @@ private:
     void cur_apt_start(const LrCbParam &);
     void cur_apt_end(const LrCbParam &);
     void cur_apt_1302(const LrCbParam &);
+    void cur_apt_100(const LrCbParam &);
 
     std::unordered_map<std::string, AirportData> airport_db;
 

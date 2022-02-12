@@ -10,6 +10,7 @@
 
 #include <utils/log.h>
 #include <utils/str_utils.h>
+#include <utils/from_chars_full.h>
 
 #include <charconv>
 #include <chrono>
@@ -57,7 +58,7 @@ static inline void only_raise_info(const ParseError &e) {
 template <typename T>
 static T num_from_str(std::string_view str, const LrCbParam &p) {
     T out_val;
-    const auto [ptr, ec] = std::from_chars<T>(str.begin(), str.end(), out_val);
+    const auto [ptr, ec] = utils::from_chars<T>(str.begin(), str.end(), out_val);
 
     switch (ec) {
         case std::errc::invalid_argument:
@@ -147,11 +148,6 @@ ParseAptDat::ParseAptDat(const std::string &path) {
     for (const auto &e : sd) {
         parse_apt_dat_file(e);
     }
-
-    std::cout << airport_db["KSEA"].city << '\n';
-    std::cout << airport_db["KSEA"].state << '\n';
-    std::cout << airport_db["KSEA"].name << '\n';
-    std::cout << airport_db["KSEA"].icao << '\n';
 }
 
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
@@ -215,17 +211,26 @@ void ParseAptDat::cur_apt_1302(const LrCbParam &p) {
     }
 }
 
+void ParseAptDat::cur_apt_100(const LrCbParam &) {
+}
+
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {
     FileLineReader(
         "/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat", [this](const LrCbParam &p) {
             const auto row_code_str = str::split_string_sv(p.line, 0);
 
             if (str::cmp_equal_sv(row_code_str.str, "1")) {
+                // Land airport
                 cur_apt_end(p);
                 cur_apt_start(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "100")) {
+                // Runway
+                cur_apt_100(p);
             } else if (str::cmp_equal_sv(row_code_str.str, "1302")) {
+                // Airport metadata
                 cur_apt_1302(p);
             } else if (str::cmp_equal_sv(row_code_str.str, "99")) {
+                // End of file, finish up last airport
                 cur_apt_end(p);
             }
         });
