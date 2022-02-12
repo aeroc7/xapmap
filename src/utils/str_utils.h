@@ -46,7 +46,7 @@ public:
     }
 
     // Returns string section from whitespace `index` to the end of the string
-    static constexpr auto split_string_tend_sv(std::string_view str, unsigned index) noexcept {
+    static constexpr auto split_string_tend_sv(std::string_view str, std::size_t index) noexcept {
         const auto len = str.length();
         std::size_t index_ctr = 0;
 

@@ -111,6 +111,11 @@ static inline std::string_view set_default_str_ne(
     return "";
 }
 
+static std::string_view split_after_safe(const LrCbParam &pline, std::size_t index) {
+    const auto split_val = str::split_string_tend_sv(pline.line, index);
+    return set_default_str_ne(split_val, pline);
+}
+
 template <typename Lambda>
 class FileLineReader {
 public:
@@ -207,15 +212,12 @@ void ParseAptDat::cur_apt_end(const LrCbParam &) {
 void ParseAptDat::cur_apt_1302(const LrCbParam &p) {
     const auto data_category = str::split_string_sv(p.line, 1);
 
-    auto split_after_safe = [](const LrCbParam &pline, unsigned index) {
-        const auto split_val = str::split_string_tend_sv(pline.line, index);
-        return set_default_str_ne(split_val, pline);
-    };
-
     if (str::cmp_equal_sv(data_category.str, "city")) {
         cur_apt.city = split_after_safe(p, 2);
     } else if (str::cmp_equal_sv(data_category.str, "state")) {
         cur_apt.state = split_after_safe(p, 2);
+    } else if (str::cmp_equal_sv(data_category.str, "country")) {
+        cur_apt.country = split_after_safe(p, 2);
     } else if (str::cmp_equal_sv(data_category.str, "datum_lat")) {
         cur_apt.coords.lat = num_from_str<double>(split_after_safe(p, 2), p);
     } else if (str::cmp_equal_sv(data_category.str, "datum_lon")) {
@@ -223,7 +225,25 @@ void ParseAptDat::cur_apt_1302(const LrCbParam &p) {
     }
 }
 
-void ParseAptDat::cur_apt_100(const LrCbParam &) {
+void ParseAptDat::cur_apt_100(const LrCbParam &p) {
+    AirportRunwayData cur_rwy;
+
+    cur_rwy.width = num_from_str<double>(split_after_safe(p, 1), p);
+
+    for (std::size_t i = 0; i < 2; ++i) {
+        const auto rwy_str_offset = (i * 9);
+
+        // Copy over runway name
+        const auto rwy_name = split_after_safe(p, 8 + rwy_str_offset);
+        std::memcpy(cur_rwy.name[i].begin(), rwy_name.begin(),
+            std::min(rwy_name.size(), cur_rwy.name[i].size()));
+
+        // Runway lat & lon
+        cur_rwy.latitude[i].lat = num_from_str<double>(split_after_safe(p, 9 + rwy_str_offset), p);
+        cur_rwy.latitude[i].lon = num_from_str<double>(split_after_safe(p, 10 + rwy_str_offset), p);
+    }
+
+    cur_apt.runways.push_back(std::move(cur_rwy));
 }
 
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {

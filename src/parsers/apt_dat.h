@@ -23,7 +23,7 @@ struct CoordPair {
 // Overall width is the same, as it's the same pavement, just opposite ends.
 struct AirportRunwayData {
     double width;
-    std::array<char, 4> name[2];
+    std::array<char, 4> name[2]{};
     CoordPair latitude[2];
     CoordPair longitude[2];
 };
@@ -32,6 +32,7 @@ struct AirportData {
     std::string icao;
     std::string name;
     std::string city;
+    std::string country;
     std::string state;
     CoordPair coords;
     std::vector<AirportRunwayData> runways;
