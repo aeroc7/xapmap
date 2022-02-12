@@ -24,6 +24,7 @@ ExternalProject_Add(glew-build
                         -DGLEW_X11=OFF
                         -DBUILD_UTILS=OFF
                         -DBUILD_SHARED_LIBS=OFF
+                        -DCMAKE_INSTALL_LIBDIR=lib
     BUILD_BYPRODUCTS    <INSTALL_DIR>/lib/${LIBRARY_OUTPUT}
 )
 

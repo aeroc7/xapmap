@@ -14,6 +14,7 @@ ExternalProject_Add(glfw-build
                         -DGLFW_BUILD_DOCS=False
                         -DBUILD_SHARED_LIBS=False
                         -DGLFW_BUILD_EXAMPLES=False
+                        -DCMAKE_INSTALL_LIBDIR=lib
     BUILD_BYPRODUCTS    <INSTALL_DIR>/lib/libglfw3.a
 )
 

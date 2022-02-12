@@ -17,6 +17,7 @@ ExternalProject_Add(freetype-build
                         -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
                         -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE
                         -DBUILD_SHARED_LIBS=OFF
+                        -DCMAKE_INSTALL_LIBDIR=lib
     BUILD_BYPRODUCTS    <INSTALL_DIR>/lib/libfreetype.a
 )
 
