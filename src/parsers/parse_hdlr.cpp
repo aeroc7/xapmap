@@ -12,6 +12,6 @@
 
 namespace parsers {
 ParseHdlr::ParseHdlr() {
-    apt_dat_hdlr = std::make_unique<ParseAptDat>("/home/bennett/X-Plane 11/Custom Scenery/");
+    apt_dat_hdlr = std::make_unique<ParseAptDat>("/home/bennett/X-Plane 11/");
 }
 }  // namespace parsers

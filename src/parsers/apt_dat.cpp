@@ -159,14 +159,14 @@ ParseAptDat::ParseAptDat(const std::string &path) {
     const auto sd = scenery_directories(path);
 
     for (const auto &e : sd) {
-        parse_apt_dat_file(e);
+        parse_apt_dat_file(path + e);
     }
 }
 
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
     std::vector<std::string> file_paths;
 
-    FileLineReader(path + "scenery_packs.ini", [&](const LrCbParam &p) {
+    FileLineReader(path + "Custom Scenery/scenery_packs.ini", [&](const LrCbParam &p) {
         const auto row_item = str::split_string_sv(p.line, 0);
 
         if (row_item.str == "SCENERY_PACK") {
@@ -247,24 +247,23 @@ void ParseAptDat::cur_apt_100(const LrCbParam &p) {
 }
 
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {
-    FileLineReader(
-        "/home/bennett/X-Plane 11/" + file + "Earth nav data/apt.dat", [this](const LrCbParam &p) {
-            const auto row_code_str = str::split_string_sv(p.line, 0);
+    FileLineReader(file + "Earth nav data/apt.dat", [this](const LrCbParam &p) {
+        const auto row_code_str = str::split_string_sv(p.line, 0);
 
-            if (str::cmp_equal_sv(row_code_str.str, "1")) {
-                // Land airport
-                cur_apt_end(p);
-                cur_apt_start(p);
-            } else if (str::cmp_equal_sv(row_code_str.str, "100")) {
-                // Runway
-                cur_apt_100(p);
-            } else if (str::cmp_equal_sv(row_code_str.str, "1302")) {
-                // Airport metadata
-                cur_apt_1302(p);
-            } else if (str::cmp_equal_sv(row_code_str.str, "99")) {
-                // End of file, finish up last airport
-                cur_apt_end(p);
-            }
-        });
+        if (str::cmp_equal_sv(row_code_str.str, "1")) {
+            // Land airport
+            cur_apt_end(p);
+            cur_apt_start(p);
+        } else if (str::cmp_equal_sv(row_code_str.str, "100")) {
+            // Runway
+            cur_apt_100(p);
+        } else if (str::cmp_equal_sv(row_code_str.str, "1302")) {
+            // Airport metadata
+            cur_apt_1302(p);
+        } else if (str::cmp_equal_sv(row_code_str.str, "99")) {
+            // End of file, finish up last airport
+            cur_apt_end(p);
+        }
+    });
 }
 }  // namespace parsers
