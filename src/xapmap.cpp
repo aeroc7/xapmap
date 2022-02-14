@@ -8,4 +8,10 @@
 
 #include "xapmap.h"
 
-namespace xapmap {}  // namespace xapmap
+namespace xapmap {
+Xapmap::Xapmap() {
+    whdlr.create_window("xapmap", 750, 500);
+    whdlr.window_loop([]() {
+    });
+}
+}  // namespace xapmap

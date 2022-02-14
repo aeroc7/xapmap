@@ -9,13 +9,17 @@
 #ifndef XAPMAP_H_
 #define XAPMAP_H_
 
+#include "graphics/window.h"
 #include "parsers/parse_hdlr.h"
 
 namespace xapmap {
 class Xapmap {
 public:
+    Xapmap();
+
 private:
     parsers::ParseHdlr phdlr;
+    graphics::Window whdlr;
 };
 }  // namespace xapmap
 

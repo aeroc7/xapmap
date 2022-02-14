@@ -5,6 +5,7 @@ add_library(project_source INTERFACE)
 # Include util directory
 target_include_directories(project_source INTERFACE "${CMAKE_CURRENT_LIST_DIR}/")
 
+add_subdirectory(graphics)
 add_subdirectory(parsers)
 add_subdirectory(utils)
 
