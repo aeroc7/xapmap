@@ -12,6 +12,10 @@
 
 namespace graphics {
 
+GlTexture::GlTexture(size_type width, size_type height) {
+    regen_texture(width, height);
+}
+
 GlTexture::GlTexture(GlTexture &&o) noexcept : tex_id{std::exchange(o.tex_id, NULL_TEXTURE)} {
 }
 
