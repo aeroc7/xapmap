@@ -8,19 +8,25 @@
 
 #include "xapmap.h"
 
+#include <config/defaults.h>
+
 namespace xapmap {
 Xapmap::Xapmap() {
-    whdlr.create_window("xapmap", 750, 500);
+    whdlr.create_window("xapmap", dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT);
     glewInit();
-    graphics::CairoMt mt{500, 500, 60};
+    graphics::CairoMt mt{dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, 60};
     mt.set_callbacks(
         [](cairo_t *) {
         },
-        [](cairo_t *) {
+        [](cairo_t *cr) {
+            cairo_set_source_rgb(cr, 0, 1, 0);
+            cairo_rectangle(cr, 50, 50, 100, 100);
+            cairo_fill(cr);
         },
         [](cairo_t *) {
         });
-    whdlr.window_loop([]() {
+    whdlr.window_loop([&mt]() {
+        mt.blit_texture();
     });
 
     mt.stop_thread();

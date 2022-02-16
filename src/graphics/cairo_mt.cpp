@@ -12,6 +12,7 @@
 #include <utils/utils.h>
 
 #include <chrono>
+#include <cstring>
 
 using namespace utils;
 
@@ -41,6 +42,7 @@ void CairoMt::render_loop() noexcept {
     try {
         CairoSurface cairo_surf{width, height};
         cairo_t *cr = cairo_surf.get_cr();
+        cairo_surface_t *surface = cairo_surf.get_surface();
 
         auto tp_convert = [](auto time_point) {
             const auto tp_us = std::chrono::time_point_cast<std::chrono::microseconds>(time_point)
@@ -55,9 +57,23 @@ void CairoMt::render_loop() noexcept {
         while (!quit_thread) {
             const auto t1 = std::chrono::steady_clock::now();
 
+            // Clear surface
+            cairo_set_source_rgb(cr, 0, 0, 0);
+            cairo_paint(cr);
+
             if (loop) {
                 loop(cr);
             }
+
+            // Finish any operations on surface
+            cairo_surface_flush(surface);
+
+            const auto stride = cairo_image_surface_get_stride(surface);
+            void *surface_data = cairo_image_surface_get_data(surface);
+
+            gl_pbo.set_buffer_data([&](void *pbo) {
+                std::memcpy(pbo, surface_data, static_cast<std::size_t>(stride * this->height));
+            });
 
             const auto t2 = std::chrono::steady_clock::now();
             do_render_sleep(tp_convert(t1), tp_convert(t2));
@@ -71,6 +87,32 @@ void CairoMt::render_loop() noexcept {
     } catch (...) {
         Log(Log::ERROR) << "Caught unknown exception...";
     }
+}
+
+void CairoMt::blit_texture() {
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    gl_texture.bind();
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    gl_pbo.bind_front_buffer();
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    glVertex2i(0, 0);
+    glTexCoord2f(0, 1);
+    glVertex2i(0, height);
+    glTexCoord2f(1, 1);
+    glVertex2i(width, height);
+    glTexCoord2f(1, 0);
+    glVertex2i(width, 0);
+    glEnd();
+
+    gl_texture.unbind();
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
 }
 
 void CairoMt::set_callbacks(CallbackType pstart, CallbackType ploop, CallbackType pstop) {

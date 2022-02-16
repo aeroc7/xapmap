@@ -29,7 +29,7 @@ private:
     void *cur_buf_handle{nullptr};
     GLuint pbo_bufs[BUF_COUNT];
 
-    std::atomic<GLuint> back_buf_index{0};
+    std::atomic<GLuint> back_buf_index{1};
     std::atomic<GLuint> front_buf_index{0};
     std::atomic<bool> back_buf_ready{true};
 };

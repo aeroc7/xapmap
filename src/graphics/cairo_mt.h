@@ -10,7 +10,6 @@
 #define CAIRO_MT_H_
 
 #include <cairo/cairo.h>
-#include <config/defaults.h>
 
 #include <functional>
 #include <thread>
@@ -27,6 +26,7 @@ public:
     explicit CairoMt(dims_type w, dims_type h, unsigned fps);
     void set_callbacks(CallbackType start, CallbackType loop, CallbackType stop);
     void stop_thread();
+    void blit_texture();
     CairoMt(const CairoMt &) = delete;
     CairoMt(CairoMt &&) = delete;
     CairoMt &operator=(const CairoMt &) = delete;
