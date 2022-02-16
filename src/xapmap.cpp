@@ -26,7 +26,16 @@ Xapmap::Xapmap() {
         [](cairo_t *) {
         });
     whdlr.window_loop([&mt]() {
+        glEnable(GL_BLEND);
+        glEnable(GL_TEXTURE_2D);
+
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         mt.blit_texture();
+
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
     });
 
     mt.stop_thread();

@@ -90,12 +90,7 @@ void CairoMt::render_loop() noexcept {
 }
 
 void CairoMt::blit_texture() {
-    glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
     gl_texture.bind();
-
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     gl_pbo.bind_front_buffer();
 
@@ -111,8 +106,6 @@ void CairoMt::blit_texture() {
     glEnd();
 
     gl_texture.unbind();
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
 }
 
 void CairoMt::set_callbacks(CallbackType pstart, CallbackType ploop, CallbackType pstop) {
