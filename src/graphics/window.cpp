@@ -13,12 +13,12 @@
 using namespace utils;
 
 namespace graphics {
-void Window::window_glfw_error_callback([[maybe_unused]] int error, const char *description) {
+void Window::glfw_error_callback([[maybe_unused]] int error, const char *description) {
     Log(Log::ERROR) << "glfw error: " << description;
 }
 
 Window::Window() {
-    glfwSetErrorCallback(window_glfw_error_callback);
+    glfwSetErrorCallback(glfw_error_callback);
 
     if (!glfwInit()) {
         throw std::runtime_error("glfwInit failed");

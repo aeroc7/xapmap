@@ -12,27 +12,26 @@
 #include <GL/glew.h>
 
 #include <atomic>
+#include <functional>
 
 namespace graphics {
 class GlPbo {
 public:
-    using PboBuf = void *;
     GlPbo(GLsizei w, GLsizei h);
-    PboBuf get_back_buffer() const noexcept;
-    void finish_back_buffer() noexcept;
+    void get_buffer_data(std::function<void(void *)> cb) noexcept;
     void bind_front_buffer() noexcept;
     ~GlPbo();
 
 private:
-    GLsizei width;
-    GLsizei height;
-    PboBuf cur_buf_handle;
-    GLuint pbo_bufs[2];
+    static constexpr std::size_t BUF_COUNT = 2;
 
-    std::atomic<GLuint> back_buf_ind{};
-    std::atomic<GLuint> front_buf_ind{};
-    std::atomic<bool> back_buf_ready{};
-    std::atomic<bool> back_buf_done{};
+    GLsizei width, height;
+    void *cur_buf_handle{nullptr};
+    GLuint pbo_bufs[BUF_COUNT];
+
+    std::atomic<GLuint> back_buf_index{0};
+    std::atomic<GLuint> front_buf_index{0};
+    std::atomic<bool> back_buf_ready{true};
 };
 }  // namespace graphics
 

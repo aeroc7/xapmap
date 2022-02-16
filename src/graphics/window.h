@@ -27,7 +27,7 @@ public:
     ~Window();
 
 private:
-    static void window_glfw_error_callback([[maybe_unused]] int error, const char *description);
+    static void glfw_error_callback(int error, const char *description);
     GLFWwindow *window{nullptr};
 };
 }  // namespace graphics
