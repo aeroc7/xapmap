@@ -24,7 +24,7 @@ GlPbo::GlPbo(GLsizei w, GLsizei h) : width(w), height(h) {
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
-void GlPbo::get_buffer_data(std::function<void(void *)> cb) noexcept {
+void GlPbo::set_buffer_data(std::function<void(void *)> cb) noexcept {
     if (!back_buf_ready || !cb) {
         return;
     }

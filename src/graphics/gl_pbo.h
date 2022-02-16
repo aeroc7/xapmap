@@ -18,7 +18,7 @@ namespace graphics {
 class GlPbo {
 public:
     GlPbo(GLsizei w, GLsizei h);
-    void get_buffer_data(std::function<void(void *)> cb) noexcept;
+    void set_buffer_data(std::function<void(void *)> cb) noexcept;
     void bind_front_buffer() noexcept;
     ~GlPbo();
 
