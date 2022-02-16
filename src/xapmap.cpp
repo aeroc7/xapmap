@@ -11,7 +11,18 @@
 namespace xapmap {
 Xapmap::Xapmap() {
     whdlr.create_window("xapmap", 750, 500);
+    glewInit();
+    graphics::CairoMt mt{500, 500, 60};
+    mt.set_callbacks(
+        [](cairo_t *) {
+        },
+        [](cairo_t *) {
+        },
+        [](cairo_t *) {
+        });
     whdlr.window_loop([]() {
     });
+
+    mt.stop_thread();
 }
 }  // namespace xapmap

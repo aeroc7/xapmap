@@ -9,6 +9,7 @@
 #ifndef XAPMAP_H_
 #define XAPMAP_H_
 
+#include "graphics/cairo_mt.h"
 #include "graphics/window.h"
 #include "parsers/parse_hdlr.h"
 
