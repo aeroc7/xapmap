@@ -25,6 +25,7 @@ public:
     ~GlTexture();
 
     void bind() const noexcept;
+    void unbind() const noexcept;
     void regen_texture(size_type width, size_type height) noexcept;
 
 private:

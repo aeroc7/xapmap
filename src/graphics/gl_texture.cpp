@@ -31,6 +31,10 @@ void GlTexture::bind() const noexcept {
     glBindTexture(GL_TEXTURE_2D, tex_id);
 }
 
+void GlTexture::unbind() const noexcept {
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void GlTexture::regen_texture(int width, int height) noexcept {
     // Calls delete on texture
     create_new_texture(width, height);
