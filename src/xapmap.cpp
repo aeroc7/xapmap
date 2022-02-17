@@ -13,8 +13,14 @@
 namespace xapmap {
 Xapmap::Xapmap() {
     whdlr.create_window("xapmap", dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT);
-    glewInit();
+
+    if (const GLenum err = glewInit(); err == GLEW_OK) {
+        throw std::runtime_error(std::string{"Failed to initialize glew: "} +
+                                 reinterpret_cast<const char *>(glewGetErrorString(err)));
+    }
+
     graphics::CairoMt mt{dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, 60};
+
     mt.set_callbacks(
         [](cairo_t *) {
         },
@@ -25,6 +31,7 @@ Xapmap::Xapmap() {
         },
         [](cairo_t *) {
         });
+
     whdlr.window_loop([&mt]() {
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
