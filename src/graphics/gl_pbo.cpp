@@ -9,18 +9,21 @@
 #include "gl_pbo.h"
 
 namespace graphics {
-GlPbo::GlPbo(GLsizei w, GLsizei h) : width(w), height(h) {
-    glGenBuffers(2, pbo_bufs);
+GlPbo::GlPbo(GLsizei w, GLsizei h) : tgt_width(w), tgt_height(h) {
+    for (auto &buf : pbo_bufs) {
+        buf.width = w;
+        buf.height = h;
 
-    for (std::size_t i = 0; i < BUF_COUNT; ++i) {
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[i]);
-        glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, nullptr, GL_DYNAMIC_DRAW);
+        glGenBuffers(1, &buf.id);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buf.id);
+        glBufferData(GL_PIXEL_UNPACK_BUFFER, buf.width * buf.height * 4, nullptr, GL_DYNAMIC_DRAW);
     }
 
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[0]);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[0].id);
     cur_buf_handle = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA8, tgt_width, tgt_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
@@ -34,19 +37,20 @@ void GlPbo::set_buffer_data(std::function<void(void *)> cb) noexcept {
 }
 
 void GlPbo::bind_front_buffer() noexcept {
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[front_buf_index]);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[front_buf_index].id);
 
     if (!back_buf_ready) {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+        glTexSubImage2D(
+            GL_TEXTURE_2D, 0, 0, 0, tgt_width, tgt_height, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[back_buf_index]);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[back_buf_index].id);
         glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
         back_buf_index = (back_buf_index + 1) % 2;
         front_buf_index = (front_buf_index + 1) % 2;
 
-        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[back_buf_index]);
-        glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[back_buf_index].id);
+        glBufferData(GL_PIXEL_UNPACK_BUFFER, tgt_width * tgt_height * 4, nullptr, GL_DYNAMIC_DRAW);
         cur_buf_handle = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 
         back_buf_ready = true;
@@ -56,6 +60,8 @@ void GlPbo::bind_front_buffer() noexcept {
 }
 
 GlPbo::~GlPbo() {
-    glDeleteBuffers(2, pbo_bufs);
+    for (const auto &buf : pbo_bufs) {
+        glDeleteBuffers(1, &buf.id);
+    }
 }
 }  // namespace graphics
