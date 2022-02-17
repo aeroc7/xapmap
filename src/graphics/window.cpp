@@ -33,6 +33,8 @@ void Window::window_loop(std::function<void()> func) {
     while (!glfwWindowShouldClose(window)) {
         int win_width, win_height;
         glfwGetFramebufferSize(window, &win_width, &win_height);
+        window_width = win_width;
+        window_height = win_height;
 
         glViewport(0, 0, win_width, win_height);
         glMatrixMode(GL_PROJECTION);
@@ -45,9 +47,6 @@ void Window::window_loop(std::function<void()> func) {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        window_width = win_width;
-        window_height = win_height;
     }
 }
 
