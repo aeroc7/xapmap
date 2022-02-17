@@ -57,10 +57,6 @@ void CairoMt::render_loop() noexcept {
         while (!quit_thread) {
             const auto t1 = std::chrono::steady_clock::now();
 
-            // Clear surface
-            cairo_set_source_rgb(cr, 0, 0, 0);
-            cairo_paint(cr);
-
             if (loop) {
                 loop(cr);
             }
