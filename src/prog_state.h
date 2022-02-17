@@ -18,8 +18,8 @@ namespace xapmap {
 class CurState {
 public:
     cairo_t *cr{nullptr};
-    std::atomic<unsigned> window_width{dflt::DEFAULT_WINDOW_WIDTH};
-    std::atomic<unsigned> window_height{dflt::DEFAULT_WINDOW_HEIGHT};
+    std::atomic<int> window_width{dflt::DEFAULT_WINDOW_WIDTH};
+    std::atomic<int> window_height{dflt::DEFAULT_WINDOW_HEIGHT};
 };
 }  // namespace xapmap
 
