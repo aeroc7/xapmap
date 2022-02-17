@@ -8,7 +8,7 @@ ExternalProject_Add(nuklear-build
     URL                 ${DEP_NUKLEAR_LOC}
     CONFIGURE_COMMAND   ""
     BUILD_COMMAND       cd <SOURCE_DIR>/src/ && sh paq.sh
-    INSTALL_COMMAND     cp <SOURCE_DIR>/src/nuklear.h <INSTALL_DIR>/include/nuklear
+    INSTALL_COMMAND     cp <SOURCE_DIR>/nuklear.h <INSTALL_DIR>/include/nuklear
 )
 
 ExternalProject_Get_Property(nuklear-build INSTALL_DIR)
