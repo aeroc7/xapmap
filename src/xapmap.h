@@ -9,18 +9,22 @@
 #ifndef XAPMAP_H_
 #define XAPMAP_H_
 
+#include <memory>
+
 #include "graphics/cairo_mt.h"
 #include "graphics/window.h"
 #include "parsers/parse_hdlr.h"
 
 namespace xapmap {
-class Xapmap {
+class Xapmap final {
 public:
     Xapmap();
+    ~Xapmap();
 
 private:
     parsers::ParseHdlr phdlr;
     graphics::Window whdlr;
+    std::unique_ptr<graphics::CairoMt> cairo_mt;
 };
 }  // namespace xapmap
 
