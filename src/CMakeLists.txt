@@ -60,5 +60,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_standalone
         glfw
         xpsdk
         fastfloat
+        nuklear
         -lm
 )
