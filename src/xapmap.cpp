@@ -10,8 +10,13 @@
 
 #include <config/defaults.h>
 
+#include "graphics/cairo_mt.h"
+#include "graphics/window.h"
+
 namespace xapmap {
 Xapmap::Xapmap() {
+    graphics::Window whdlr;
+
     whdlr.create_window("xapmap", dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT);
 
     if (const GLenum err = glewInit(); err != GLEW_OK) {
@@ -23,17 +28,20 @@ Xapmap::Xapmap() {
         dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, 60);
 
     cairo_mt->set_callbacks(
-        [](cairo_t *) {
+        [this](cairo_t *cr) {
+            prog.cr = cr;
+            main_gui.on_start(prog);
         },
-        [](cairo_t *cr) {
-            cairo_set_source_rgb(cr, 0, 1, 0);
-            cairo_rectangle(cr, 50, 50, 100, 100);
-            cairo_fill(cr);
+        [this](cairo_t *cr) {
+            prog.cr = cr;
+            main_gui.on_draw(prog);
         },
-        [](cairo_t *) {
+        [this](cairo_t *cr) {
+            prog.cr = cr;
+            main_gui.on_stop(prog);
         });
 
-    whdlr.window_loop([this]() {
+    whdlr.window_loop([&]() {
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
 
@@ -44,6 +52,12 @@ Xapmap::Xapmap() {
 
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
+
+        // This communicates the window height with the render thread
+        const auto [w, h] = whdlr.get_window_dims();
+        // Safe: atomic variables
+        prog.window_width = w;
+        prog.window_height = h;
     });
 }
 

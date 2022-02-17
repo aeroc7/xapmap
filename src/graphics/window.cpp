@@ -45,6 +45,9 @@ void Window::window_loop(std::function<void()> func) {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        window_width = win_width;
+        window_height = win_height;
     }
 }
 

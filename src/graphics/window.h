@@ -24,11 +24,15 @@ public:
     Window &operator=(Window &&) = delete;
     void create_window(const std::string &title, int w, int h);
     void window_loop(std::function<void()> func);
+    std::tuple<unsigned, unsigned> get_window_dims() const {
+        return {window_width, window_height};
+    }
     ~Window();
 
 private:
     static void glfw_error_callback(int error, const char *description);
     GLFWwindow *window{nullptr};
+    int window_width{}, window_height{};
 };
 }  // namespace graphics
 

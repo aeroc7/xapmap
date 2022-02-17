@@ -4,3 +4,5 @@ target_sources(project_source INTERFACE
     cairo_mt.cpp
     gl_texture.cpp
 )
+
+add_subdirectory(gui)

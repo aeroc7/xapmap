@@ -11,9 +11,12 @@
 
 #include <memory>
 
-#include "graphics/cairo_mt.h"
-#include "graphics/window.h"
-#include "parsers/parse_hdlr.h"
+#include "graphics/gui/gui_main.h"
+#include "prog_state.h"
+
+namespace graphics {
+class CairoMt;
+}
 
 namespace xapmap {
 class Xapmap final {
@@ -22,9 +25,9 @@ public:
     ~Xapmap();
 
 private:
-    parsers::ParseHdlr phdlr;
-    graphics::Window whdlr;
+    CurState prog;
     std::unique_ptr<graphics::CairoMt> cairo_mt;
+    graphics::GuiMain main_gui;
 };
 }  // namespace xapmap
 
