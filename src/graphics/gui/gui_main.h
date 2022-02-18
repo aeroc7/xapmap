@@ -11,6 +11,10 @@
 
 #include <prog_state.h>
 
+#include <memory>
+
+#include "nuklear_impl/nuklear_wrapper.h"
+
 namespace graphics {
 class GuiMain {
 public:
@@ -19,6 +23,7 @@ public:
     void on_stop(const xapmap::CurState &prog);
 
 private:
+    std::unique_ptr<nk_impl::NkGui> gui;
 };
 }  // namespace graphics
 

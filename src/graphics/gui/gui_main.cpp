@@ -8,16 +8,18 @@
 
 #include "gui_main.h"
 
+using namespace nk_impl;
+
 namespace graphics {
 void GuiMain::on_start(const xapmap::CurState &) {
+    gui = std::make_unique<NkGui>();
 }
 
 void GuiMain::on_draw(const xapmap::CurState &prog) {
-    cairo_set_source_rgba(prog.cr, 0.35, 0.45, 0.75, 1.0);
-    cairo_rectangle(prog.cr, 0, 0, prog.window_width, prog.window_height);
-    cairo_fill(prog.cr);
+    gui->draw_frame(prog);
 }
 
 void GuiMain::on_stop(const xapmap::CurState &) {
+    gui.reset();
 }
 }  // namespace graphics
