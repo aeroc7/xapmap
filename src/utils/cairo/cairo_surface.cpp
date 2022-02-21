@@ -52,31 +52,37 @@ CairoSurface::CairoSurface(dims_type w, dims_type h) {
     ASSERT(h > 0);
     surface = cairo_image_surface_create(SURFACE_FORMAT, w, h);
     check_cairo_surface_error(cairo_surface_status(surface));
+
+    cr = cairo_create(surface);
+    check_cairo_surface_error(cairo_status(cr));
 }
 
 CairoSurface::CairoSurface(CairoSurface &&other) noexcept
-    : surface{std::exchange(other.surface, nullptr)} {
+    : cr{std::exchange(other.cr, nullptr)}, surface{std::exchange(other.surface, nullptr)} {
 }
 
 CairoSurface &CairoSurface::operator=(CairoSurface &&other) noexcept {
     if (this != &other) {
         surface = std::exchange(other.surface, nullptr);
+        cr = std::exchange(other.cr, nullptr);
     }
 
     return *this;
 }
 
 bool CairoSurface::surface_good() noexcept {
-    if (surface == nullptr) {
+    if (!surface || !cr) {
         return false;
     }
 
-    return cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS;
+    auto surf_success = [](auto surf) {
+        return (surf) == CAIRO_STATUS_SUCCESS;
+    };
+
+    return surf_success(cairo_surface_status(surface)) && surf_success(cairo_status(cr));
 }
 
 cairo_t *CairoSurface::get_cr() noexcept {
-    cr = cairo_create(surface);
-    check_cairo_surface_error(cairo_status(cr));
     return cr;
 }
 
