@@ -1,4 +1,3 @@
-add_subdirectory(binembed)
 add_subdirectory(pixman)
 add_subdirectory(freetype)
 add_subdirectory(cairo)
