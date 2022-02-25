@@ -11,7 +11,44 @@
 
 #include <cairo/cairo.h>
 
+#include <stdexcept>
+
 namespace utils {
+class CairoError : public std::exception {
+public:
+    CairoError(const std::string &msg) : message{ERROR_HEADER + msg} {
+    }
+
+    const char *what() const noexcept {
+        return message.c_str();
+    }
+
+private:
+    static constexpr auto ERROR_HEADER = "Cairo error: ";
+    std::string message;
+};
+
+constexpr void check_cairo_error(cairo_status_t status) {
+    switch (status) {
+        case CAIRO_STATUS_SUCCESS:
+            break;
+        case CAIRO_STATUS_NULL_POINTER:
+            throw CairoError("NULL_POINTER");
+        case CAIRO_STATUS_NO_MEMORY:
+            throw CairoError("NO_MEMORY");
+        case CAIRO_STATUS_READ_ERROR:
+            throw CairoError("READ_ERROR");
+        case CAIRO_STATUS_INVALID_CONTENT:
+            throw CairoError("INVALID_CONTENT");
+        case CAIRO_STATUS_INVALID_FORMAT:
+            throw CairoError("INVALID_FORMAT");
+        case CAIRO_STATUS_INVALID_VISUAL:
+            throw CairoError("INVALID_VISUAL");
+        default:
+            throw CairoError("Unknown error: " + std::to_string(status));
+    }
+}
+
 class CairoSurface final {
 public:
     // Copy operators disabled for now, but trivial to implement later
