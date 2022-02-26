@@ -184,8 +184,12 @@ void cairo_nk_text(cairo_t *cr, utils::CairoFont &font, double x, double y, doub
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
     font.set_font_face(cr);
+
+    cairo_text_extents_t te;
+    cairo_text_extents(cr, text, &te);
+
     cairo_set_font_size(cr, sz);
-    cairo_move_to(cr, x, y);
+    cairo_move_to(cr, x, y + te.height + ((sz - te.height) / 2.0));
     cairo_show_text(cr, text);
     cairo_restore(cr);
 }
@@ -214,8 +218,7 @@ NkGui::NkGui(const xapmap::CurState &prog) {
         auto fnt_stuff_ref = reinterpret_cast<FontStuffForNk *>(hdl.ptr);
         cairo_set_font_size(fnt_stuff_ref->last_state->cr, fnt_stuff_ref->FONT_SIZE);
         cairo_text_extents(fnt_stuff_ref->last_state->cr, text_nul_term.c_str(), &te);
-
-        return static_cast<float>(te.width + te.x_bearing);
+        return static_cast<float>(te.width + (te.x_bearing * 4.0));
     };
     nk_init_default(&ctx, &nk_font);
 }
@@ -318,7 +321,7 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
                 const auto t = reinterpret_cast<const nk_command_text *>(cmd);
                 auto user_font = reinterpret_cast<utils::CairoFont *>(t->font->userdata.ptr);
                 std::string text_nul_term{t->string, static_cast<std::size_t>(t->length)};
-                cairo_nk_text(prog.cr, *user_font, t->x, static_cast<double>(t->y + t->height),
+                cairo_nk_text(prog.cr, *user_font, t->x, static_cast<double>(t->y),
                     font_stuff.FONT_SIZE, text_nul_term.c_str(), t->foreground);
                 break;
             }

@@ -9,7 +9,7 @@
 #ifndef NUKLEAR_IMPL_H_
 #define NUKLEAR_IMPL_H_
 
-#include <Roboto_Regular.h>
+#include <Roboto_Medium.h>
 #include <prog_state.h>
 #include <utils/cairo/cairo_fonts.h>
 
@@ -29,9 +29,9 @@ public:
 private:
     struct FontStuffForNk {
         utils::CairoFont roboto_fnt{
-            reinterpret_cast<const std::byte *>(bin2h::ROBOTO_REGULAR), bin2h::ROBOTO_REGULAR_SIZE};
+            reinterpret_cast<const std::byte *>(bin2h::ROBOTO_MEDIUM), bin2h::ROBOTO_MEDIUM_SIZE};
         const xapmap::CurState *last_state;
-        static constexpr auto FONT_SIZE = 20.0;
+        static constexpr auto FONT_SIZE = 15.5;
     };
 
     FontStuffForNk font_stuff;
