@@ -66,18 +66,12 @@ endfunction()
 # Usage:
 #   bin2h(SOURCE_FILE "Logo.png" HEADER_FILE "Logo.h" VARIABLE_NAME "LOGO_PNG")
 function(BIN2H)
-    set(options APPEND NULL_TERMINATE)
     set(oneValueArgs SOURCE_FILE VARIABLE_NAME HEADER_FILE)
     cmake_parse_arguments(BIN2H "${options}" "${oneValueArgs}" "" ${ARGN})
 
     # reads source file contents as hex string
     file(READ ${BIN2H_SOURCE_FILE} hexString HEX)
     string(LENGTH ${hexString} hexStringLength)
-
-    # appends null byte if asked
-    if(BIN2H_NULL_TERMINATE)
-        set(hexString "${hexString}00")
-    endif()
 
     # wraps the hex string into multiple lines at column 32(i.e. 16 bytes per line)
     wrap_string(VARIABLE hexString AT_COLUMN 32)
@@ -93,13 +87,19 @@ function(BIN2H)
     string(TOUPPER "${BIN2H_VARIABLE_NAME}" BIN2H_VARIABLE_NAME)
 
     # declares byte array and the length variables
-    set(arrayDefinition "#include <cstdint>\n\nconst std::uint8_t ${BIN2H_VARIABLE_NAME}[] = { ${arrayValues} };")
-    set(arraySizeDefinition "const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE = ${arraySize};")
+    set(arrayDefinition "#include <cstdint>\n\nnamespace bin2h {\nconst std::uint8_t ${BIN2H_VARIABLE_NAME}[] = { ${arrayValues} };")
+    set(arraySizeDefinition "const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE = ${arraySize};\n}")
 
     set(declarations "${arrayDefinition}\n\n${arraySizeDefinition}\n\n")
-    if(BIN2H_APPEND)
-        file(APPEND ${BIN2H_HEADER_FILE} "${declarations}")
-    else()
-        file(WRITE ${BIN2H_HEADER_FILE} "${declarations}")
-    endif()
+
+    get_filename_component(BIN2H_HEADER_DIR ${BIN2H_HEADER_FILE} DIRECTORY)
+    get_filename_component(BIN2H_HEADER_FNAME_NOEXT ${BIN2H_HEADER_FILE} NAME_WLE)
+    string(REPLACE "-" "_" BIN2H_HEADER_FNAME_NOEXT ${BIN2H_HEADER_FNAME_NOEXT})
+    string(TOUPPER ${BIN2H_HEADER_FNAME_NOEXT} BIN2H_HEADER_FNAME_NOEXT_UP)
+
+    file(WRITE ${BIN2H_HEADER_DIR}/${BIN2H_HEADER_FNAME_NOEXT}.cpp "${declarations}")
+
+    set(headerContent "#ifndef ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n#define ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n\n#include <cstdint>\n\nnamespace bin2h {\nextern const std::uint8_t ${BIN2H_VARIABLE_NAME}[];\nextern const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE;\n}\n\n#endif  // ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_")
+
+    file(WRITE ${BIN2H_HEADER_DIR}/${BIN2H_HEADER_FNAME_NOEXT}.h "${headerContent}")
 endfunction()

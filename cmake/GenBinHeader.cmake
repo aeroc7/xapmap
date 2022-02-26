@@ -5,9 +5,11 @@ function(gen_bin_header file_dir)
         get_filename_component(raw_file_name_ne ${font_file} NAME_WLE)
         get_filename_component(raw_file_name_e ${font_file} NAME)
         get_filename_component(raw_file_dir ${font_file} DIRECTORY)
+
+        string(REPLACE "-" "_" HEADER_FILE_NAME ${raw_file_name_ne})
         
-        if(NOT EXISTS "${raw_file_dir}/${raw_file_name_ne}.h")
-            message(STATUS "\t ${raw_file_name_e} --> ${raw_file_name_ne}.h")
+        if(NOT EXISTS "${raw_file_dir}/${HEADER_FILE_NAME}.h")
+            message(STATUS "Generating binary header for ${raw_file_name_e} ...")
             include(${PARAMETER_REF_DIR}/cmake/BinToHeader.cmake)
             bin2h(SOURCE_FILE ${font_file} HEADER_FILE ${raw_file_dir}/${raw_file_name_ne}.h VARIABLE_NAME ${raw_file_name_ne})
         endif()

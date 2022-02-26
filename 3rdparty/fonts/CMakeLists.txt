@@ -23,6 +23,8 @@ function(get_font_resource url font_name)
         COMMENT "Generating ${font_name} binary headers..."
     )
 
+    target_include_directories(fonts INTERFACE ${SOURCE_DIR})
+
     add_dependencies(fonts gen-${font_name})
 endfunction()
 
