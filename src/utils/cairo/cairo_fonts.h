@@ -23,7 +23,8 @@ public:
     CairoFont &operator=(CairoFont &&) noexcept;
     CairoFont(const CairoFont &) = delete;
     CairoFont &operator=(const CairoFont &) = delete;
-    void set_font_face(cairo_t *cr);
+    void set_font_face(cairo_t *cr) noexcept;
+    cairo_font_extents_t font_dimensions(cairo_t *cr) noexcept;
 
     ~CairoFont();
 

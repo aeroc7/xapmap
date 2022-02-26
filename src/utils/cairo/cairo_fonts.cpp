@@ -56,8 +56,14 @@ CairoFont &CairoFont::operator=(CairoFont &&o) noexcept {
     return *this;
 }
 
-void CairoFont::set_font_face(cairo_t *cr) {
+void CairoFont::set_font_face(cairo_t *cr) noexcept {
     cairo_set_font_face(cr, cairo_font_face);
+}
+
+cairo_font_extents_t CairoFont::font_dimensions(cairo_t *cr) noexcept {
+    cairo_font_extents_t fe;
+    cairo_font_extents(cr, &fe);
+    return fe;
 }
 
 void CairoFont::create_font() {
@@ -72,6 +78,7 @@ void CairoFont::create_font() {
     error = FT_New_Memory_Face(ft_lib, reinterpret_cast<const FT_Byte *>(font_buf.data()),
         static_cast<long>(font_buf.size()), 0, &ft_font_face);
     handle_freetype_error(error);
+    create_cairo_font();
 }
 
 void CairoFont::create_cairo_font() {
