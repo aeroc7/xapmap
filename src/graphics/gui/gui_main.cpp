@@ -11,8 +11,8 @@
 using namespace nk_impl;
 
 namespace graphics {
-void GuiMain::on_start(const xapmap::CurState &) {
-    gui = std::make_unique<NkGui>();
+void GuiMain::on_start(const xapmap::CurState &prog) {
+    gui = std::make_unique<NkGui>(prog);
 }
 
 void GuiMain::on_draw(const xapmap::CurState &prog) {

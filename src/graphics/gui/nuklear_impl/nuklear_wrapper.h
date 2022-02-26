@@ -9,14 +9,16 @@
 #ifndef NUKLEAR_IMPL_H_
 #define NUKLEAR_IMPL_H_
 
+#include <Roboto_Regular.h>
 #include <prog_state.h>
+#include <utils/cairo/cairo_fonts.h>
 
 #include "nuklear_include.h"
 
 namespace nk_impl {
 class NkGui final {
 public:
-    NkGui();
+    NkGui(const xapmap::CurState &prog);
     NkGui(const NkGui &) = delete;
     NkGui(NkGui &&) = delete;
     NkGui &operator=(const NkGui &) = delete;
@@ -25,6 +27,15 @@ public:
     ~NkGui();
 
 private:
+    struct FontStuffForNk {
+        utils::CairoFont roboto_fnt{
+            reinterpret_cast<const std::byte *>(bin2h::ROBOTO_REGULAR), bin2h::ROBOTO_REGULAR_SIZE};
+        const xapmap::CurState *last_state;
+        static constexpr auto FONT_SIZE = 20.0;
+    };
+
+    FontStuffForNk font_stuff;
+    nk_user_font nk_font;
     nk_context ctx;
 };
 }  // namespace nk_impl
