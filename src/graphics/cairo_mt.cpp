@@ -28,7 +28,7 @@ void CairoMt::do_render_sleep(long time_start, long time_end) const noexcept {
         time_end += 1;
     }
 
-    int64_t diff_time_micros = (time_end - time_start) / 1000;
+    int64_t diff_time_micros = time_end - time_start;
     const auto ms_sleep_time = static_cast<int64_t>((1000.0 / fps_tgt) * 1000.0);
 
     if (diff_time_micros >= ms_sleep_time || diff_time_micros < 0) {
