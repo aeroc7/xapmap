@@ -86,16 +86,16 @@ function(BIN2H)
     string(MAKE_C_IDENTIFIER "${BIN2H_VARIABLE_NAME}" BIN2H_VARIABLE_NAME)
     string(TOUPPER "${BIN2H_VARIABLE_NAME}" BIN2H_VARIABLE_NAME)
 
-    # declares byte array and the length variables
-    set(arrayDefinition "#include <cstdint>\n\nnamespace bin2h {\nconst std::uint8_t ${BIN2H_VARIABLE_NAME}[] = { ${arrayValues} };")
-    set(arraySizeDefinition "const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE = ${arraySize};\n}")
-
-    set(declarations "${arrayDefinition}\n\n${arraySizeDefinition}\n\n")
-
     get_filename_component(BIN2H_HEADER_DIR ${BIN2H_HEADER_FILE} DIRECTORY)
     get_filename_component(BIN2H_HEADER_FNAME_NOEXT ${BIN2H_HEADER_FILE} NAME_WLE)
     string(REPLACE "-" "_" BIN2H_HEADER_FNAME_NOEXT ${BIN2H_HEADER_FNAME_NOEXT})
     string(TOUPPER ${BIN2H_HEADER_FNAME_NOEXT} BIN2H_HEADER_FNAME_NOEXT_UP)
+
+    # declares byte array and the length variables
+    set(arrayDefinition "#include \"${BIN2H_HEADER_FNAME_NOEXT}.h\"\n\nnamespace bin2h {\nconst std::uint8_t ${BIN2H_VARIABLE_NAME}[] = { ${arrayValues} };")
+    set(arraySizeDefinition "const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE = ${arraySize};\n}")
+
+    set(declarations "${arrayDefinition}\n\n${arraySizeDefinition}\n\n")
 
     file(WRITE ${BIN2H_HEADER_DIR}/${BIN2H_HEADER_FNAME_NOEXT}.cpp "${declarations}")
 
