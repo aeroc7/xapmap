@@ -187,9 +187,8 @@ void cairo_nk_text(cairo_t *cr, utils::CairoFont &font, double x, double y, doub
 
     cairo_text_extents_t te;
     cairo_text_extents(cr, text, &te);
-
     cairo_set_font_size(cr, sz);
-    cairo_move_to(cr, x, y + te.height + ((sz - te.height) / 2.0));
+    cairo_move_to(cr, x, y + te.height + ((sz - te.height)));
     cairo_show_text(cr, text);
     cairo_restore(cr);
 }
