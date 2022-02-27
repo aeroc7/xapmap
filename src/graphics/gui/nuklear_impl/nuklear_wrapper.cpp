@@ -11,6 +11,7 @@
 #include <utils/cairo/rounded_rectangle.h>
 #include <utils/utils.h>
 
+#include <cmath>
 #include <string>
 #include <tuple>
 
@@ -188,7 +189,8 @@ void cairo_nk_text(cairo_t *cr, utils::CairoFont &font, double x, double y, doub
     cairo_text_extents_t te;
     cairo_text_extents(cr, text, &te);
     cairo_set_font_size(cr, sz);
-    cairo_move_to(cr, x, y + te.height + ((sz - te.height)));
+    cairo_move_to(
+        cr, x, y + te.height + std::ceil((sz - te.height) / 2.0) - (te.height - -te.y_bearing));
     cairo_show_text(cr, text);
     cairo_restore(cr);
 }
@@ -206,8 +208,9 @@ void cairo_nk_scissor(cairo_t *cr, double x, double y, double w, double h) noexc
 
 }  // namespace
 
-NkGui::NkGui(const xapmap::CurState &prog) {
+NkGui::NkGui(const xapmap::CurState &prog, ImplCallback cb) {
     font_stuff.last_state = &prog;
+    gui_cb = cb;
     nk_font.userdata = nk_handle_ptr(&font_stuff);
     nk_font.height = font_stuff.FONT_SIZE;
     nk_font.width = [](nk_handle hdl, float, const char *text, int len) -> float {
@@ -219,6 +222,7 @@ NkGui::NkGui(const xapmap::CurState &prog) {
         cairo_text_extents(fnt_stuff_ref->last_state->cr, text_nul_term.c_str(), &te);
         return static_cast<float>(te.width + (te.x_bearing * 4.0));
     };
+
     nk_init_default(&ctx, &nk_font);
 }
 
@@ -256,20 +260,11 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
 
     nk_input_end(&ctx);
 
-    if (nk_begin(&ctx, "Show", nk_rect(50, 50, 220, 220),
-            NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_SCALABLE)) {
+    if (gui_cb) {
+        gui_cb(&ctx);
     }
-
-    nk_end(&ctx);
-
-    if (nk_begin(&ctx, "Show2", nk_rect(300, 50, 220, 220),
-            NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_SCALABLE)) {
-    }
-
-    nk_end(&ctx);
 
     const nk_command *cmd = nullptr;
-
     nk_foreach(cmd, &ctx) {
         switch (cmd->type) {
             case NK_COMMAND_NOP:
@@ -334,8 +329,8 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
                 const auto t = reinterpret_cast<const nk_command_text *>(cmd);
                 auto user_font = reinterpret_cast<utils::CairoFont *>(t->font->userdata.ptr);
                 std::string text_nul_term{t->string, static_cast<std::size_t>(t->length)};
-                cairo_nk_text(prog.cr, *user_font, t->x, static_cast<double>(t->y),
-                    font_stuff.FONT_SIZE, text_nul_term.c_str(), t->foreground);
+                cairo_nk_text(prog.cr, *user_font, t->x, t->y, font_stuff.FONT_SIZE,
+                    text_nul_term.c_str(), t->foreground);
                 break;
             }
             default:
