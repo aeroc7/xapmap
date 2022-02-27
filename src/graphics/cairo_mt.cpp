@@ -18,6 +18,9 @@ using namespace utils;
 
 namespace graphics {
 CairoMt::CairoMt(dims_type w, dims_type h, unsigned fps) : width(w), height(h), fps_tgt(fps) {
+}
+
+void CairoMt::start_thread() {
     render_thread = std::thread{&CairoMt::render_loop, this};
 }
 
@@ -40,6 +43,10 @@ void CairoMt::do_render_sleep(long time_start, long time_end) const noexcept {
 
 void CairoMt::render_loop() noexcept {
     try {
+        if (!callbacks_set) {
+            throw std::runtime_error("Draw callbacks have not been set");
+        }
+
         CairoSurface cairo_surf{width, height};
         cairo_t *cr = cairo_surf.get_cr();
         cairo_surface_t *surface = cairo_surf.get_surface();
@@ -105,9 +112,12 @@ void CairoMt::blit_texture() {
 }
 
 void CairoMt::set_callbacks(CallbackType pstart, CallbackType ploop, CallbackType pstop) {
-    start = pstart;
-    loop = ploop;
-    stop = pstop;
+    if (!callbacks_set) {
+        start = pstart;
+        loop = ploop;
+        stop = pstop;
+        callbacks_set = true;
+    }
 }
 
 void CairoMt::stop_thread() {

@@ -25,6 +25,7 @@ public:
 
     explicit CairoMt(dims_type w, dims_type h, unsigned fps);
     void set_callbacks(CallbackType start, CallbackType loop, CallbackType stop);
+    void start_thread();
     void stop_thread();
     void blit_texture();
     CairoMt(const CairoMt &) = delete;
@@ -42,6 +43,7 @@ private:
     CallbackType start, loop, stop;
     std::thread render_thread;
     std::atomic_bool quit_thread{false};
+    std::atomic_bool callbacks_set{false};
 };
 }  // namespace graphics
 

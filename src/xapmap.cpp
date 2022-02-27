@@ -45,6 +45,8 @@ Xapmap::Xapmap() {
             main_gui.on_stop(prog);
         });
 
+    cairo_mt->start_thread();
+
     whdlr.window_loop([&]() {
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
