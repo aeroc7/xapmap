@@ -223,39 +223,53 @@ NkGui::NkGui(const xapmap::CurState &prog) {
     nk_init_default(&ctx, &nk_font);
 }
 
-enum { EASY, HARD };
-static int op = EASY;
-static float value = 0.6f;
-
 void NkGui::draw_frame(const xapmap::CurState &prog) {
     font_stuff.last_state = &prog;
     cairo_clear_surface(prog.cr, nk_color{1, 0, 0, 255});
 
-    if (nk_begin(&ctx, "Show", nk_rect(50, 50, 220, 220),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
-        // fixed widget pixel width
-        nk_layout_row_static(&ctx, 30, 80, 1);
-        if (nk_button_label(&ctx, "button")) {
-            // event handling
+    nk_input_begin(&ctx);
+
+    // psa: nk_input_button 0 for mouse is up, 1 for mouse is down
+
+    auto cursor_event = prog.get_cursor_event();
+    while (std::get<bool>(cursor_event)) {
+        const auto event_data = std::get<graphics::CursorStats>(cursor_event);
+        switch (event_data.type) {
+            case graphics::CursorStatType::MOUSE_MOVE: {
+                nk_input_motion(
+                    &ctx, static_cast<int>(event_data.x_pos), static_cast<int>(event_data.y_pos));
+                break;
+            }
+            case graphics::CursorStatType::LEFT_MOUSE_PRESS: {
+                nk_input_button(&ctx, NK_BUTTON_LEFT, static_cast<int>(event_data.x_pos),
+                    static_cast<int>(event_data.y_pos), 1);
+                break;
+            }
+            case graphics::CursorStatType::LEFT_MOUSE_RELEASE: {
+                nk_input_button(&ctx, NK_BUTTON_LEFT, static_cast<int>(event_data.x_pos),
+                    static_cast<int>(event_data.y_pos), 0);
+                break;
+            }
         }
-        // fixed widget window ratio width
-        nk_layout_row_dynamic(&ctx, 30, 2);
-        if (nk_option_label(&ctx, "easy", op == EASY))
-            op = EASY;
-        if (nk_option_label(&ctx, "hard", op == HARD))
-            op = HARD;
-        // custom widget pixel width
-        nk_layout_row_begin(&ctx, NK_STATIC, 30, 2);
-        {
-            nk_layout_row_push(&ctx, 50);
-            nk_label(&ctx, "Volume:", NK_TEXT_LEFT);
-            nk_layout_row_push(&ctx, 110);
-            nk_slider_float(&ctx, 0, &value, 1.0f, 0.1f);
-        }
-        nk_layout_row_end(&ctx);
+
+        cursor_event = prog.get_cursor_event();
     }
 
-    const nk_command *cmd;
+    nk_input_end(&ctx);
+
+    if (nk_begin(&ctx, "Show", nk_rect(50, 50, 220, 220),
+            NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_SCALABLE)) {
+    }
+
+    nk_end(&ctx);
+
+    if (nk_begin(&ctx, "Show2", nk_rect(300, 50, 220, 220),
+            NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_SCALABLE)) {
+    }
+
+    nk_end(&ctx);
+
+    const nk_command *cmd = nullptr;
 
     nk_foreach(cmd, &ctx) {
         switch (cmd->type) {
@@ -331,7 +345,6 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     }
 
     nk_clear(&ctx);
-    nk_end(&ctx);
 }
 
 NkGui::~NkGui() {

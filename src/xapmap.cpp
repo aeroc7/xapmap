@@ -17,6 +17,10 @@ namespace xapmap {
 Xapmap::Xapmap() {
     graphics::Window whdlr;
 
+    whdlr.set_cursor_cb([this](graphics::CursorStats cs) {
+        prog.add_cursor_event(cs);
+    });
+
     whdlr.create_window("xapmap", dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT);
 
     if (const GLenum err = glewInit(); err != GLEW_OK) {
@@ -58,6 +62,11 @@ Xapmap::Xapmap() {
         // Safe: atomic variables
         prog.window_width = w;
         prog.window_height = h;
+
+        /*const auto cursor_stats = whdlr.get_mouse_stats();
+        prog.cursor.x_pos = cursor_stats.x_pos;
+        prog.cursor.y_pos = cursor_stats.y_pos;
+        prog.cursor.click = cursor_stats.click;*/
     });
 }
 

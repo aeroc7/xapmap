@@ -8,13 +8,62 @@
 
 #include "window.h"
 
+#include <GLFW/glfw3.h>
 #include <utils/log.h>
+
+#include <cmath>
 
 using namespace utils;
 
 namespace graphics {
+static bool cursor_pos_checks(double xpos, double ypos) noexcept {
+    if (xpos < 0 || ypos < 0) {
+        return false;
+    }
+
+    if (std::isnan(xpos) || std::isnan(ypos)) {
+        return false;
+    }
+
+    return true;
+}
 void Window::glfw_error_callback([[maybe_unused]] int error, const char *description) {
     Log(Log::ERROR) << "glfw error: " << description;
+}
+
+void Window::glfw_cursor_pos_callback(GLFWwindow *window, double xpos, double ypos) noexcept {
+    Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+    if (!cursor_pos_checks(xpos, ypos)) {
+        return;
+    }
+
+    if (us->cursor_cb) {
+        us->cursor_cb({.type = CursorStatType::MOUSE_MOVE,
+            .x_pos = static_cast<std::uint_fast32_t>(xpos),
+            .y_pos = static_cast<std::uint_fast32_t>(ypos)});
+    }
+}
+
+void Window::glfw_cursor_button_callback(GLFWwindow *window, int button, int action, int) noexcept {
+    Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
+    double xpos, ypos;
+
+    if (!us->cursor_cb) {
+        return;
+    }
+
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        us->cursor_cb({.type = CursorStatType::LEFT_MOUSE_PRESS,
+            .x_pos = static_cast<std::uint_fast32_t>(xpos),
+            .y_pos = static_cast<std::uint_fast32_t>(ypos)});
+    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        us->cursor_cb({.type = CursorStatType::LEFT_MOUSE_RELEASE,
+            .x_pos = static_cast<std::uint_fast32_t>(xpos),
+            .y_pos = static_cast<std::uint_fast32_t>(ypos)});
+    }
 }
 
 Window::Window() {
@@ -58,6 +107,11 @@ void Window::create_window(const std::string &title, int w, int h) {
     if (window == nullptr) {
         throw std::runtime_error("Failed to create glfw window");
     }
+
+    glfwSetWindowUserPointer(window, this);
+
+    glfwSetCursorPosCallback(window, glfw_cursor_pos_callback);
+    glfwSetMouseButtonCallback(window, glfw_cursor_button_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);

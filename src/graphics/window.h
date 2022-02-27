@@ -9,14 +9,22 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
-#include <GLFW/glfw3.h>
-
 #include <functional>
 #include <string>
 
+struct GLFWwindow;
+
 namespace graphics {
+enum class CursorStatType { MOUSE_MOVE, LEFT_MOUSE_PRESS, LEFT_MOUSE_RELEASE };
+struct CursorStats {
+    CursorStatType type;
+    std::uint_fast32_t x_pos;
+    std::uint_fast32_t y_pos;
+};
+
 class Window {
 public:
+    using CursorCbSignature = std::function<void(CursorStats)>;
     Window();
     Window(const Window &) = delete;
     Window(Window &&) = delete;
@@ -27,12 +35,21 @@ public:
     std::tuple<int, int> get_window_dims() const {
         return {window_width, window_height};
     }
+
+    void set_cursor_cb(CursorCbSignature cb) {
+        cursor_cb = cb;
+    }
+
     ~Window();
 
 private:
+    static void glfw_cursor_button_callback(
+        GLFWwindow *window, int button, int action, int mods) noexcept;
+    static void glfw_cursor_pos_callback(GLFWwindow *window, double xpos, double ypos) noexcept;
     static void glfw_error_callback(int error, const char *description);
     GLFWwindow *window{nullptr};
     int window_width{}, window_height{};
+    CursorCbSignature cursor_cb;
 };
 }  // namespace graphics
 
