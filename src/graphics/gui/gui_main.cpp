@@ -26,7 +26,7 @@ void GuiMain::on_start(const xapmap::CurState &prog) {
     gui->set_clear_col({35, 35, 35, 255});
 }
 
-void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx) {
+void GuiMain::gui_callback(const xapmap::CurState &, nk_context *ctx) {
     if (nk_begin(ctx, "MainWindow", nk_recti(0, 0, 0, 0), NK_WINDOW_BACKGROUND)) {
     }
     nk_end(ctx);

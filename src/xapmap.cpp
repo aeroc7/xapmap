@@ -29,7 +29,7 @@ Xapmap::Xapmap() {
     }
 
     cairo_mt = std::make_unique<graphics::CairoMt>(
-        dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, 60);
+        dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, dflt::DEFAULT_WINDOW_FPS);
 
     cairo_mt->set_callbacks(
         [this](cairo_t *cr) {
