@@ -208,7 +208,7 @@ void cairo_nk_scissor(cairo_t *cr, double x, double y, double w, double h) noexc
 
 }  // namespace
 
-NkGui::NkGui(const xapmap::CurState &prog, ImplCallback cb) {
+NkGui::NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback cb) {
     font_stuff.last_state = &prog;
     gui_cb = cb;
     nk_font.userdata = nk_handle_ptr(&font_stuff);
@@ -224,11 +224,20 @@ NkGui::NkGui(const xapmap::CurState &prog, ImplCallback cb) {
     };
 
     nk_init_default(&ctx, &nk_font);
+
+    // User-provided callback to set custom styling for Nuklear
+    if (style_set) {
+        style_set(prog, &ctx);
+    }
+}
+
+void NkGui::set_clear_col(nk_color col) noexcept {
+    clear_col = col;
 }
 
 void NkGui::draw_frame(const xapmap::CurState &prog) {
     font_stuff.last_state = &prog;
-    cairo_clear_surface(prog.cr, nk_color{1, 0, 0, 255});
+    cairo_clear_surface(prog.cr, clear_col);
 
     nk_input_begin(&ctx);
 
@@ -261,7 +270,7 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     nk_input_end(&ctx);
 
     if (gui_cb) {
-        gui_cb(&ctx);
+        gui_cb(prog, &ctx);
     }
 
     const nk_command *cmd = nullptr;

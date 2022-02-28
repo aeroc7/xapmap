@@ -20,13 +20,14 @@
 namespace nk_impl {
 class NkGui final {
 public:
-    using ImplCallback = std::function<void(nk_context *ctx)>;
-    NkGui(const xapmap::CurState &prog, ImplCallback cb);
+    using ImplCallback = std::function<void(const xapmap::CurState &prog, nk_context *ctx)>;
+    NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback cb);
     NkGui(const NkGui &) = delete;
     NkGui(NkGui &&) = delete;
     NkGui &operator=(const NkGui &) = delete;
     NkGui &operator=(NkGui &&) = delete;
     void draw_frame(const xapmap::CurState &prog);
+    void set_clear_col(nk_color col) noexcept;
     ~NkGui();
 
 private:
@@ -40,7 +41,8 @@ private:
     FontStuffForNk font_stuff;
     nk_user_font nk_font;
     nk_context ctx;
-    ImplCallback gui_cb{nullptr};
+    ImplCallback gui_cb;
+    nk_color clear_col{0, 0, 0, 255};
 };
 }  // namespace nk_impl
 

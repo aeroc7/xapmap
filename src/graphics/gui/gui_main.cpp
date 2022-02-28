@@ -8,21 +8,32 @@
 
 #include "gui_main.h"
 
+#include <config/gui_theme.h>
+
 using namespace nk_impl;
 
 namespace graphics {
 void GuiMain::on_start(const xapmap::CurState &prog) {
-    gui = std::make_unique<NkGui>(prog, [this](nk_context *ctx) {
-        gui_callback(ctx);
-    });
+    gui = std::make_unique<NkGui>(
+        prog,
+        [](const xapmap::CurState &, nk_context *ctx) {
+            set_gui_theme(ctx);
+        },
+        [this](const xapmap::CurState &prog, nk_context *ctx) {
+            gui_callback(prog, ctx);
+        });
+
+    gui->set_clear_col({35, 35, 35, 255});
 }
 
-void GuiMain::gui_callback(nk_context *ctx) {
-    if (nk_begin(ctx, "MyWindow", nk_recti(10, 10, 210, dflt::DEFAULT_WINDOW_HEIGHT - 20),
-            NK_WINDOW_CLOSABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_MOVABLE)) {
-        nk_layout_row_static(ctx, 30, 80, 1);
-        if (nk_button_label(ctx, "Button!")) {
-        }
+void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx) {
+    if (nk_begin(ctx, "MainWindow", nk_recti(0, 0, 0, 0), NK_WINDOW_BACKGROUND)) {
+    }
+    nk_end(ctx);
+
+    if (nk_begin(ctx, "SubWindow", nk_recti(50, 50, 250, 350),
+            NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE | NK_WINDOW_MOVABLE | NK_WINDOW_BORDER |
+                NK_WINDOW_SCALABLE)) {
     }
 
     nk_end(ctx);
