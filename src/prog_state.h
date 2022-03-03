@@ -28,7 +28,6 @@ public:
     void add_cursor_event(graphics::CursorStats cs) const {
         std::lock_guard<std::mutex> lock{cursor_mut};
         if (cursor_event_q.size() == MAX_CURSOR_EVENTS) {
-            std::cout << MAX_CURSOR_EVENTS << '\n';
             return;
         }
         cursor_event_q.push(cs);
