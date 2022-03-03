@@ -248,6 +248,11 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
         const auto event_data = std::get<graphics::CursorStats>(cursor_event);
         switch (event_data.type) {
             case graphics::CursorStatType::MOUSE_MOVE: {
+                if (event_data.x_pos > static_cast<std::uint_fast32_t>(prog.window_width) ||
+                    event_data.y_pos > static_cast<std::uint_fast32_t>(prog.window_height)) {
+                    break;
+                }
+
                 nk_input_motion(
                     &ctx, static_cast<int>(event_data.x_pos), static_cast<int>(event_data.y_pos));
                 break;

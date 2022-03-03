@@ -54,6 +54,9 @@ void Window::glfw_cursor_button_callback(GLFWwindow *window, int button, int act
     }
 
     glfwGetCursorPos(window, &xpos, &ypos);
+    if (!cursor_pos_checks(xpos, ypos)) {
+        return;
+    }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         us->cursor_cb({.type = CursorStatType::LEFT_MOUSE_PRESS,
@@ -102,6 +105,7 @@ void Window::window_loop(std::function<void()> func) {
 void Window::create_window(const std::string &title, int w, int h) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     window = glfwCreateWindow(w, h, title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
