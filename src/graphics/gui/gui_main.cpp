@@ -16,17 +16,25 @@ namespace graphics {
 void GuiMain::on_start(const xapmap::CurState &prog) {
     gui = std::make_unique<NkGui>(
         prog,
-        [](const xapmap::CurState &, nk_context *ctx) {
+        [](const xapmap::CurState &, nk_context *ctx,
+            xapmap::CurState::input_event_q_value_type &) {
             set_gui_theme(ctx);
         },
-        [this](const xapmap::CurState &prog, nk_context *ctx) {
-            gui_callback(prog, ctx);
+        [this](const xapmap::CurState &prog, nk_context *ctx,
+            xapmap::CurState::input_event_q_value_type &e) {
+            gui_callback(prog, ctx, e);
         });
 
     gui->set_clear_col({35, 35, 35, 255});
 }
 
-void GuiMain::gui_callback(const xapmap::CurState &, nk_context *ctx) {
+void GuiMain::gui_callback(const xapmap::CurState &, nk_context *ctx,
+    xapmap::CurState::input_event_q_value_type &input_events) {
+    while (!input_events.empty()) {
+        // const auto &ev = input_events.front();
+        input_events.pop();
+    }
+
     if (nk_begin(ctx, "MainWindow", nk_recti(0, 0, 0, 0), NK_WINDOW_BACKGROUND)) {
     }
     nk_end(ctx);

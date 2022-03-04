@@ -20,7 +20,8 @@
 namespace nk_impl {
 class NkGui final {
 public:
-    using ImplCallback = std::function<void(const xapmap::CurState &prog, nk_context *ctx)>;
+    using ImplCallback = std::function<void(const xapmap::CurState &prog, nk_context *ctx,
+        xapmap::CurState::input_event_q_value_type &events)>;
     NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback cb);
     NkGui(const NkGui &) = delete;
     NkGui(NkGui &&) = delete;
@@ -37,6 +38,8 @@ private:
         const xapmap::CurState *last_state;
         static constexpr auto FONT_SIZE = 20;
     };
+
+    bool input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcept;
 
     FontStuffForNk font_stuff;
     nk_user_font nk_font;

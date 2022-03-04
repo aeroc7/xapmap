@@ -23,7 +23,8 @@ public:
     void on_stop(const xapmap::CurState &prog);
 
 private:
-    void gui_callback(const xapmap::CurState &prog, nk_context *ctx);
+    void gui_callback(const xapmap::CurState &prog, nk_context *ctx,
+        xapmap::CurState::input_event_q_value_type &);
     std::unique_ptr<nk_impl::NkGui> gui;
 };
 }  // namespace graphics

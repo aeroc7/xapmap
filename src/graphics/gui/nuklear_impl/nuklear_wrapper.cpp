@@ -227,7 +227,8 @@ NkGui::NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback 
 
     // User-provided callback to set custom styling for Nuklear
     if (style_set) {
-        style_set(prog, &ctx);
+        xapmap::CurState::input_event_q_value_type vs;
+        style_set(prog, &ctx, vs);
     }
 }
 
@@ -242,10 +243,16 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     nk_input_begin(&ctx);
 
     // psa: nk_input_button 0 for mouse is up, 1 for mouse is down
-
-    auto cursor_event = prog.get_cursor_event();
-    while (std::get<bool>(cursor_event)) {
+    xapmap::CurState::input_event_q_value_type not_nk_inputs;
+    for (auto cursor_event = prog.get_cursor_event(); std::get<bool>(cursor_event);
+         cursor_event = prog.get_cursor_event()) {
         const auto event_data = std::get<graphics::CursorStats>(cursor_event);
+
+        if (input_event_is_for_nk(event_data) == false) {
+            not_nk_inputs.push(event_data);
+            continue;
+        }
+
         switch (event_data.type) {
             case graphics::CursorStatType::MOUSE_MOVE: {
                 if (event_data.x_pos > static_cast<std::uint_fast32_t>(prog.window_width) ||
@@ -268,14 +275,12 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
                 break;
             }
         }
-
-        cursor_event = prog.get_cursor_event();
     }
 
     nk_input_end(&ctx);
 
     if (gui_cb) {
-        gui_cb(prog, &ctx);
+        gui_cb(prog, &ctx, not_nk_inputs);
     }
 
     const nk_command *cmd = nullptr;
@@ -353,6 +358,29 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     }
 
     nk_clear(&ctx);
+}
+
+bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcept {
+    auto window = ctx.begin;
+
+    while (window) {
+        switch (in_stats.type) {
+            case graphics::CursorStatType::LEFT_MOUSE_PRESS:
+            case graphics::CursorStatType::LEFT_MOUSE_RELEASE:
+            case graphics::CursorStatType::MOUSE_MOVE: {
+                const struct nk_rect *window_dims = &window->bounds;
+                if (NK_INBOX(static_cast<float>(in_stats.x_pos), static_cast<float>(in_stats.y_pos),
+                        window_dims->x, window_dims->y, window_dims->w, window_dims->h)) {
+                    return true;
+                }
+                break;
+            }
+        }
+
+        window = window->next;
+    }
+
+    return false;
 }
 
 NkGui::~NkGui() {

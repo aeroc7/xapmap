@@ -21,6 +21,7 @@
 namespace xapmap {
 class CurState {
 public:
+    using input_event_q_value_type = std::queue<graphics::CursorStats>;
     cairo_t *cr{nullptr};
     std::atomic<int> window_width{dflt::DEFAULT_WINDOW_WIDTH};
     std::atomic<int> window_height{dflt::DEFAULT_WINDOW_HEIGHT};
@@ -49,7 +50,7 @@ public:
 private:
     static constexpr std::size_t MAX_CURSOR_EVENTS = 128;
     mutable std::mutex cursor_mut;
-    mutable std::queue<graphics::CursorStats> cursor_event_q;
+    mutable input_event_q_value_type cursor_event_q;
 };
 }  // namespace xapmap
 
