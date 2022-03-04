@@ -363,7 +363,24 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
 bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcept {
     auto window = ctx.begin;
 
+    // Filter out the possibility that the mouse has been clicked before, and is being held down.
+    // Our input queue does *not* handle this case, because its only purpose is to give us new
+    // events. So we need to query NK to see if the mouse is down, and return immediately if so.
+    if (nk_input_is_mouse_down(&ctx.input, NK_BUTTON_LEFT)) {
+        return true;
+    }
+
+    auto next_window = [](nk_window *&win) {
+        win = win->next;
+    };
+
     while (window) {
+        // Skip over closed/minimized/inactive windows.
+        if (!nk_window_is_active(&ctx, window->name_string)) {
+            next_window(window);
+            continue;
+        }
+
         switch (in_stats.type) {
             case graphics::CursorStatType::LEFT_MOUSE_PRESS:
             case graphics::CursorStatType::LEFT_MOUSE_RELEASE:
@@ -377,7 +394,7 @@ bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcep
             }
         }
 
-        window = window->next;
+        next_window(window);
     }
 
     return false;
