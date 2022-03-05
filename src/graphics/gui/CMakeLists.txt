@@ -4,3 +4,4 @@ target_sources(project_source INTERFACE
 )
 
 add_subdirectory(nuklear_impl)
+add_subdirectory(map)

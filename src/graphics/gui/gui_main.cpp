@@ -26,14 +26,19 @@ void GuiMain::on_start(const xapmap::CurState &prog) {
         });
 
     gui->set_clear_col({35, 35, 35, 255});
+
+    map = std::make_unique<graphics::MapMain>();
 }
 
-void GuiMain::gui_callback(const xapmap::CurState &, nk_context *ctx,
+void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx,
     xapmap::CurState::input_event_q_value_type &input_events) {
     while (!input_events.empty()) {
-        // const auto &ev = input_events.front();
+        const auto &ev = input_events.front();
+        map->handle_input_event(ev);
         input_events.pop();
     }
+
+    map->draw_map(prog);
 
     if (nk_begin(ctx, "MainWindow", nk_recti(0, 0, 0, 0), NK_WINDOW_BACKGROUND)) {
     }
@@ -52,6 +57,7 @@ void GuiMain::on_draw(const xapmap::CurState &prog) {
 }
 
 void GuiMain::on_stop(const xapmap::CurState &) {
+    map.reset();
     gui.reset();
 }
 }  // namespace graphics

@@ -13,6 +13,7 @@
 
 #include <memory>
 
+#include "map/map_main.h"
 #include "nuklear_impl/nuklear_wrapper.h"
 
 namespace graphics {
@@ -26,6 +27,7 @@ private:
     void gui_callback(const xapmap::CurState &prog, nk_context *ctx,
         xapmap::CurState::input_event_q_value_type &);
     std::unique_ptr<nk_impl::NkGui> gui;
+    std::unique_ptr<graphics::MapMain> map;
 };
 }  // namespace graphics
 
