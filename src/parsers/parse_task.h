@@ -23,8 +23,8 @@ public:
     template <typename... Args>
     void start(Args... args) {
         std::packaged_task<std::unique_ptr<Task>(Args...)> pt(
-            [](Args &&...larg) -> std::unique_ptr<Task> {
-                return std::make_unique<Task>(std::forward<Args>(larg)...);
+            [this](Args &&...larg) -> std::unique_ptr<Task> {
+                return std::make_unique<Task>(std::forward<Args>(larg)..., this->quit_thread);
             });
 
         task_future = pt.get_future();
@@ -62,6 +62,7 @@ public:
     }
 
     ~ParseTask() {
+        quit_thread = true;
         task_thread.join();
     }
 
@@ -69,6 +70,7 @@ private:
     std::thread task_thread;
     std::future<std::unique_ptr<Task>> task_future;
     std::unique_ptr<Task> task_handle;
+    std::atomic_bool quit_thread{false};
     bool got_future_val{false};
 };
 }  // namespace parsers

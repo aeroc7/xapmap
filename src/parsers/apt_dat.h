@@ -9,6 +9,7 @@
 #ifndef APT_DAT_H_
 #define APT_DAT_H_
 
+#include <atomic>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -47,8 +48,7 @@ struct LrCbParam {
 
 class ParseAptDat {
 public:
-    ParseAptDat(const std::string &path);
-
+    ParseAptDat(const std::string &path, const std::atomic_bool &);
     std::optional<const AirportData *> get_icao_info(const std::string &icao) const;
 
 private:
@@ -61,7 +61,7 @@ private:
     void cur_apt_100(const LrCbParam &);
 
     std::unordered_map<std::string, AirportData> airport_db;
-
+    const std::atomic_bool &stop_parsing;
     AirportData cur_apt;
 };
 }  // namespace parsers
