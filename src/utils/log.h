@@ -17,13 +17,13 @@
 
 namespace utils {
 struct SourceLocation {
-    constexpr SourceLocation(const char *f, const char *func, uint_least32_t l)
+    constexpr SourceLocation(const char *f, const char *func, std::uint_least32_t l)
         : filename(f), function(func), line(l) {
     }
     constexpr const char *get_filename() const noexcept {
         return filename;
     }
-    constexpr uint_least32_t get_line() const noexcept {
+    constexpr std::uint_least32_t get_line() const noexcept {
         return line;
     }
     constexpr const char *get_function() const noexcept {
@@ -33,7 +33,7 @@ struct SourceLocation {
     static constexpr SourceLocation current(
 #if defined(__clang__) || defined(__GNUC__)
         const char *fileName = __builtin_FILE(), const char *functionName = __builtin_FUNCTION(),
-        uint_least32_t line = __builtin_LINE()) noexcept {
+        std::uint_least32_t line = __builtin_LINE()) noexcept {
 #else
 #error "unsupported";
 #endif
@@ -55,12 +55,12 @@ private:
 
     const char *filename;
     const char *function;
-    uint_least32_t line;
+    std::uint_least32_t line;
 };
 
 class Log {
 public:
-    enum class LogType : uint8_t { Info = 0, Error };
+    enum class LogType : std::uint8_t { Info = 0, Error };
     static constexpr auto INFO = LogType::Info;
     static constexpr auto ERROR = LogType::Error;
 
