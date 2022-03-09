@@ -27,7 +27,7 @@ private:
     void gui_callback(const xapmap::CurState &prog, nk_context *ctx,
         xapmap::CurState::input_event_q_value_type &);
     std::unique_ptr<nk_impl::NkGui> gui;
-    std::unique_ptr<graphics::MapMain> map;
+    std::unique_ptr<graphics::MapMain> map_gui;
 };
 }  // namespace graphics
 
