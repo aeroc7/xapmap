@@ -64,11 +64,6 @@ Xapmap::Xapmap() {
         // Safe: atomic variables
         prog.window_width = w;
         prog.window_height = h;
-
-        /*const auto cursor_stats = whdlr.get_mouse_stats();
-        prog.cursor.x_pos = cursor_stats.x_pos;
-        prog.cursor.y_pos = cursor_stats.y_pos;
-        prog.cursor.click = cursor_stats.click;*/
     });
 }
 
