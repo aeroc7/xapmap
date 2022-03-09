@@ -8,10 +8,14 @@
 
 #include "parse_hdlr.h"
 
+#include <future>
+#include <thread>
+
 #include "apt_dat.h"
 
 namespace parsers {
 ParseHdlr::ParseHdlr() {
-    apt_dat_hdlr = std::make_unique<ParseAptDat>("/home/bennett/X-Plane 11/");
+    ap_database.parse_task = std::make_unique<ParseTask<ParseAptDat>>();
+    ap_database.parse_task->start("/home/bennett/X-Plane 11/");
 }
 }  // namespace parsers

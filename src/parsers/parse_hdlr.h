@@ -12,14 +12,36 @@
 #include <memory>
 
 #include "apt_dat.h"
+#include "parse_task.h"
 
 namespace parsers {
-class ParseHdlr {
+template <typename Tclass>
+class ParseHdlrWrapper final {
+public:
+    std::optional<const Tclass *> get_task() const {
+        ASSERT(parse_task.operator bool());
+        if (!finished()) {
+            return std::nullopt;
+        }
+
+        return parse_task.get()->get_data();
+    }
+
+    bool finished() const noexcept {
+        ASSERT(parse_task.operator bool());
+        return parse_task.get()->ready();
+    }
+
+private:
+    friend class ParseHdlr;
+    std::unique_ptr<ParseTask<Tclass>> parse_task;
+};
+
+class ParseHdlr final {
 public:
     ParseHdlr();
 
-private:
-    std::unique_ptr<ParseAptDat> apt_dat_hdlr;
+    ParseHdlrWrapper<ParseAptDat> ap_database;
 };
 }  // namespace parsers
 

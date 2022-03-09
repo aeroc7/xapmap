@@ -9,6 +9,7 @@
 #ifndef APT_DAT_H_
 #define APT_DAT_H_
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -47,6 +48,8 @@ struct LrCbParam {
 class ParseAptDat {
 public:
     ParseAptDat(const std::string &path);
+
+    std::optional<const AirportData *> get_icao_info(const std::string &icao) const;
 
 private:
     std::vector<std::string> scenery_directories(const std::string &path) const;

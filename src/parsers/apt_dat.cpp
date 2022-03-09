@@ -266,4 +266,12 @@ void ParseAptDat::parse_apt_dat_file(const std::string &file) {
         }
     });
 }
+
+std::optional<const AirportData *> ParseAptDat::get_icao_info(const std::string &icao) const {
+    if (!airport_db.contains(icao)) {
+        return std::nullopt;
+    }
+
+    return {&airport_db.at(icao)};
+}
 }  // namespace parsers

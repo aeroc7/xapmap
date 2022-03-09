@@ -13,5 +13,9 @@ void MapMain::handle_input_event(const graphics::CursorStats &i) {
     input_stats = i;
 }
 void MapMain::draw_map(const xapmap::CurState &) {
+    // if (parse_hdlr.ap_database.finished()) {
+    //     const auto val = parse_hdlr.ap_database.get_task().value();
+    //     std::cout << val->get_icao_info("KSEA").value()->name << '\n';
+    // }
 }
 }  // namespace graphics
