@@ -38,8 +38,8 @@ void Window::glfw_cursor_pos_callback(GLFWwindow *window, double xpos, double yp
         return;
     }
 
-    if (us->cursor_cb) {
-        us->cursor_cb({.type = CursorStatType::MOUSE_MOVE,
+    if (us->input_cb) {
+        us->input_cb({.type = InputStatType::MOUSE_MOVE,
             .x_pos = static_cast<std::uint_fast32_t>(xpos),
             .y_pos = static_cast<std::uint_fast32_t>(ypos)});
     }
@@ -49,7 +49,7 @@ void Window::glfw_cursor_button_callback(GLFWwindow *window, int button, int act
     Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
     double xpos, ypos;
 
-    if (!us->cursor_cb) {
+    if (!us->input_cb) {
         return;
     }
 
@@ -59,14 +59,80 @@ void Window::glfw_cursor_button_callback(GLFWwindow *window, int button, int act
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        us->cursor_cb({.type = CursorStatType::LEFT_MOUSE_PRESS,
+        us->input_cb({.type = InputStatType::LEFT_MOUSE_PRESS,
             .x_pos = static_cast<std::uint_fast32_t>(xpos),
             .y_pos = static_cast<std::uint_fast32_t>(ypos)});
     } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-        us->cursor_cb({.type = CursorStatType::LEFT_MOUSE_RELEASE,
+        us->input_cb({.type = InputStatType::LEFT_MOUSE_RELEASE,
             .x_pos = static_cast<std::uint_fast32_t>(xpos),
             .y_pos = static_cast<std::uint_fast32_t>(ypos)});
     }
+}
+
+void Window::glfw_char_callback(GLFWwindow *window, unsigned int key) noexcept {
+    Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+    if (!std::isalnum(static_cast<unsigned char>(key))) {
+        return;
+    }
+
+    if (!us->input_cb) {
+        return;
+    }
+
+    us->input_cb({.type = InputStatType::KEY_INPUT, .key = static_cast<std::uint_fast32_t>(key)});
+}
+
+void Window::glfw_key_callback(
+    GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods*/) noexcept {
+    Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+    InputStats stat;
+
+    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        stat.type = InputStatType::KEY_PRESS;
+    } else {
+        stat.type = InputStatType::KEY_RELEASE;
+    }
+
+    switch (key) {
+        case GLFW_KEY_LEFT_SHIFT:
+        case GLFW_KEY_RIGHT_SHIFT:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::SHIFT);
+            break;
+        case GLFW_KEY_LEFT_CONTROL:
+        case GLFW_KEY_RIGHT_CONTROL:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::CTRL);
+            break;
+        case GLFW_KEY_DELETE:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::DEL);
+            break;
+        case GLFW_KEY_ENTER:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::ENTER);
+            break;
+        case GLFW_KEY_TAB:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::TAB);
+            break;
+        case GLFW_KEY_BACKSPACE:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::BACKSPACE);
+            break;
+        case GLFW_KEY_UP:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::UP);
+            break;
+        case GLFW_KEY_DOWN:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::DOWN);
+            break;
+        case GLFW_KEY_LEFT:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::LEFT);
+            break;
+        case GLFW_KEY_RIGHT:
+            stat.key = static_cast<std::uint_fast32_t>(InputKeyType::RIGHT);
+            break;
+        default:
+            return;
+    }
+
+    us->input_cb(stat);
 }
 
 Window::Window() {
@@ -116,6 +182,8 @@ void Window::create_window(const std::string &title, int w, int h) {
 
     glfwSetCursorPosCallback(window, glfw_cursor_pos_callback);
     glfwSetMouseButtonCallback(window, glfw_cursor_button_callback);
+    glfwSetCharCallback(window, glfw_char_callback);
+    glfwSetKeyCallback(window, glfw_key_callback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);

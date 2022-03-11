@@ -17,7 +17,7 @@ namespace xapmap {
 Xapmap::Xapmap() {
     graphics::Window whdlr;
 
-    whdlr.set_cursor_cb([this](graphics::CursorStats cs) {
+    whdlr.set_input_cb([this](graphics::InputStats cs) {
         prog.add_cursor_event(cs);
     });
 

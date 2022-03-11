@@ -15,16 +15,41 @@
 struct GLFWwindow;
 
 namespace graphics {
-enum class CursorStatType { MOUSE_MOVE, LEFT_MOUSE_PRESS, LEFT_MOUSE_RELEASE };
-struct CursorStats {
-    CursorStatType type;
+enum class InputKeyType {
+    SHIFT,
+    CTRL,
+    DEL,
+    ENTER,
+    TAB,
+    BACKSPACE,
+    COPY,
+    CUT,
+    PASTE,
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
+
+enum class InputStatType {
+    MOUSE_MOVE,
+    LEFT_MOUSE_PRESS,
+    LEFT_MOUSE_RELEASE,
+    KEY_PRESS,
+    KEY_RELEASE,
+    KEY_INPUT
+};
+
+struct InputStats {
+    InputStatType type;
+    std::uint_fast32_t key;
     std::uint_fast32_t x_pos;
     std::uint_fast32_t y_pos;
 };
 
 class Window {
 public:
-    using CursorCbSignature = std::function<void(CursorStats)>;
+    using InputCbSignature = std::function<void(InputStats)>;
     Window();
     Window(const Window &) = delete;
     Window(Window &&) = delete;
@@ -36,8 +61,8 @@ public:
         return {window_width, window_height};
     }
 
-    void set_cursor_cb(CursorCbSignature cb) {
-        cursor_cb = cb;
+    void set_input_cb(InputCbSignature cb) {
+        input_cb = cb;
     }
 
     ~Window();
@@ -47,9 +72,12 @@ private:
         GLFWwindow *window, int button, int action, int mods) noexcept;
     static void glfw_cursor_pos_callback(GLFWwindow *window, double xpos, double ypos) noexcept;
     static void glfw_error_callback(int error, const char *description);
+    static void glfw_char_callback(GLFWwindow *window, unsigned int codepoint) noexcept;
+    static void glfw_key_callback(
+        GLFWwindow *window, int key, int scancode, int action, int mods) noexcept;
     GLFWwindow *window{nullptr};
     int window_width{}, window_height{};
-    CursorCbSignature cursor_cb;
+    InputCbSignature input_cb;
 };
 }  // namespace graphics
 

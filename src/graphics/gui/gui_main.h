@@ -28,6 +28,8 @@ private:
         xapmap::CurState::input_event_q_value_type &);
     std::unique_ptr<nk_impl::NkGui> gui;
     std::unique_ptr<graphics::MapMain> map_gui;
+    std::string input_buf;
+    static constexpr std::size_t INPUT_BUF_MAX = 9;
 };
 }  // namespace graphics
 

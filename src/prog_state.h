@@ -21,12 +21,12 @@
 namespace xapmap {
 class CurState {
 public:
-    using input_event_q_value_type = std::queue<graphics::CursorStats>;
+    using input_event_q_value_type = std::queue<graphics::InputStats>;
     cairo_t *cr{nullptr};
     std::atomic<int> window_width{dflt::DEFAULT_WINDOW_WIDTH};
     std::atomic<int> window_height{dflt::DEFAULT_WINDOW_HEIGHT};
 
-    void add_cursor_event(graphics::CursorStats cs) const {
+    void add_cursor_event(graphics::InputStats cs) const {
         std::lock_guard<std::mutex> lock{cursor_mut};
         if (cursor_event_q.size() == MAX_CURSOR_EVENTS) {
             return;
@@ -36,13 +36,13 @@ public:
 
     // Boolean value will be true if the event is valid
     // Invalid event returned only if there are no more events
-    std::tuple<graphics::CursorStats, bool> get_cursor_event() const {
+    std::tuple<graphics::InputStats, bool> get_cursor_event() const {
         std::lock_guard<std::mutex> lock{cursor_mut};
         if (cursor_event_q.empty()) {
             return {{}, false};
         }
 
-        graphics::CursorStats next_event = cursor_event_q.front();
+        graphics::InputStats next_event = cursor_event_q.front();
         cursor_event_q.pop();
         return {next_event, true};
     }

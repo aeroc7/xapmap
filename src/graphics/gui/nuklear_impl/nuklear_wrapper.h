@@ -39,7 +39,7 @@ private:
         static constexpr auto FONT_SIZE = 20;
     };
 
-    bool input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcept;
+    bool input_event_is_for_nk(const graphics::InputStats &in_stats) noexcept;
 
     FontStuffForNk font_stuff;
     nk_user_font nk_font;

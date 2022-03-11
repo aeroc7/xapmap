@@ -41,6 +41,41 @@ private:
     double r, g, b, a;
 };
 namespace {
+constexpr nk_keys input_key_to_nk_key(std::uint_fast32_t key_id) noexcept {
+    using it = graphics::InputKeyType;
+
+    const it key = static_cast<it>(key_id);
+
+    switch (key) {
+        case it::SHIFT:
+            return NK_KEY_SHIFT;
+        case it::CTRL:
+            return NK_KEY_CTRL;
+        case it::DEL:
+            return NK_KEY_DEL;
+        case it::ENTER:
+            return NK_KEY_ENTER;
+        case it::TAB:
+            return NK_KEY_TAB;
+        case it::BACKSPACE:
+            return NK_KEY_BACKSPACE;
+        case it::COPY:
+            return NK_KEY_COPY;
+        case it::CUT:
+            return NK_KEY_CUT;
+        case it::PASTE:
+            return NK_KEY_PASTE;
+        case it::UP:
+            return NK_KEY_UP;
+        case it::DOWN:
+            return NK_KEY_DOWN;
+        case it::LEFT:
+            return NK_KEY_LEFT;
+        case it::RIGHT:
+            return NK_KEY_RIGHT;
+    }
+}
+
 void cairo_clear_surface(cairo_t *cr, CairoColor col) noexcept {
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
@@ -218,9 +253,10 @@ NkGui::NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback 
         std::string text_nul_term{text, static_cast<std::size_t>(len)};
 
         auto fnt_stuff_ref = reinterpret_cast<FontStuffForNk *>(hdl.ptr);
+        fnt_stuff_ref->roboto_fnt.set_font_face(fnt_stuff_ref->last_state->cr);
         cairo_set_font_size(fnt_stuff_ref->last_state->cr, fnt_stuff_ref->FONT_SIZE);
         cairo_text_extents(fnt_stuff_ref->last_state->cr, text_nul_term.c_str(), &te);
-        return static_cast<float>(te.width + (te.x_bearing * 4.0));
+        return static_cast<float>(te.x_advance);
     };
 
     nk_init_default(&ctx, &nk_font);
@@ -246,15 +282,25 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     xapmap::CurState::input_event_q_value_type not_nk_inputs;
     for (auto cursor_event = prog.get_cursor_event(); std::get<bool>(cursor_event);
          cursor_event = prog.get_cursor_event()) {
-        const auto event_data = std::get<graphics::CursorStats>(cursor_event);
+        const auto event_data = std::get<graphics::InputStats>(cursor_event);
 
-        if (input_event_is_for_nk(event_data) == false) {
+        auto is_mouse_input = [](graphics::InputStatType t) noexcept {
+            if (t == graphics::InputStatType::KEY_INPUT ||
+                t == graphics::InputStatType::KEY_PRESS ||
+                t == graphics::InputStatType::KEY_RELEASE) {
+                return false;
+            }
+
+            return true;
+        };
+
+        if (input_event_is_for_nk(event_data) == false && is_mouse_input(event_data.type)) {
             not_nk_inputs.push(event_data);
             continue;
         }
 
         switch (event_data.type) {
-            case graphics::CursorStatType::MOUSE_MOVE: {
+            case graphics::InputStatType::MOUSE_MOVE: {
                 if (event_data.x_pos > static_cast<std::uint_fast32_t>(prog.window_width) ||
                     event_data.y_pos > static_cast<std::uint_fast32_t>(prog.window_height)) {
                     break;
@@ -264,16 +310,25 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
                     &ctx, static_cast<int>(event_data.x_pos), static_cast<int>(event_data.y_pos));
                 break;
             }
-            case graphics::CursorStatType::LEFT_MOUSE_PRESS: {
+            case graphics::InputStatType::LEFT_MOUSE_PRESS: {
                 nk_input_button(&ctx, NK_BUTTON_LEFT, static_cast<int>(event_data.x_pos),
                     static_cast<int>(event_data.y_pos), 1);
                 break;
             }
-            case graphics::CursorStatType::LEFT_MOUSE_RELEASE: {
+            case graphics::InputStatType::LEFT_MOUSE_RELEASE: {
                 nk_input_button(&ctx, NK_BUTTON_LEFT, static_cast<int>(event_data.x_pos),
                     static_cast<int>(event_data.y_pos), 0);
                 break;
             }
+            case graphics::InputStatType::KEY_INPUT:
+                nk_input_char(&ctx, static_cast<char>(event_data.key));
+                break;
+            case graphics::InputStatType::KEY_PRESS:
+                nk_input_key(&ctx, input_key_to_nk_key(event_data.key), true);
+                break;
+            case graphics::InputStatType::KEY_RELEASE:
+                nk_input_key(&ctx, input_key_to_nk_key(event_data.key), false);
+                break;
         }
     }
 
@@ -360,7 +415,7 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
     nk_clear(&ctx);
 }
 
-bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcept {
+bool NkGui::input_event_is_for_nk(const graphics::InputStats &in_stats) noexcept {
     auto window = ctx.begin;
 
     // Filter out the possibility that the mouse has been clicked before, and is being held down.
@@ -382,9 +437,9 @@ bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcep
         }
 
         switch (in_stats.type) {
-            case graphics::CursorStatType::LEFT_MOUSE_PRESS:
-            case graphics::CursorStatType::LEFT_MOUSE_RELEASE:
-            case graphics::CursorStatType::MOUSE_MOVE: {
+            case graphics::InputStatType::LEFT_MOUSE_PRESS:
+            case graphics::InputStatType::LEFT_MOUSE_RELEASE:
+            case graphics::InputStatType::MOUSE_MOVE: {
                 const struct nk_rect *window_dims = &window->bounds;
                 if (NK_INBOX(static_cast<float>(in_stats.x_pos), static_cast<float>(in_stats.y_pos),
                         window_dims->x, window_dims->y, window_dims->w, window_dims->h)) {
@@ -392,6 +447,8 @@ bool NkGui::input_event_is_for_nk(const graphics::CursorStats &in_stats) noexcep
                 }
                 break;
             }
+            default:
+                return false;
         }
 
         next_window(window);

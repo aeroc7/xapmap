@@ -15,11 +15,11 @@
 namespace graphics {
 class MapMain {
 public:
-    void handle_input_event(const graphics::CursorStats &i);
+    void handle_input_event(const graphics::InputStats &i);
     void draw_map(const xapmap::CurState &prog);
 
 private:
-    graphics::CursorStats input_stats;
+    graphics::InputStats input_stats;
     parsers::ParseHdlr parse_hdlr;
 };
 }  // namespace graphics
