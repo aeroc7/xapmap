@@ -15,6 +15,8 @@
 
 #include "map/map_main.h"
 #include "nuklear_impl/nuklear_wrapper.h"
+#include "windows/airport_search.h"
+#include "windows/task_bar.h"
 
 namespace graphics {
 class GuiMain {
@@ -28,8 +30,9 @@ private:
         xapmap::CurState::input_event_q_value_type &);
     std::unique_ptr<nk_impl::NkGui> gui;
     std::unique_ptr<graphics::MapMain> map_gui;
-    std::string input_buf;
-    static constexpr std::size_t INPUT_BUF_MAX = 9;
+
+    AirportSearch ap_search_window;
+    TaskBar task_bar_window;
 };
 }  // namespace graphics
 

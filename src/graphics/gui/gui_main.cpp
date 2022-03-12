@@ -28,7 +28,6 @@ void GuiMain::on_start(const xapmap::CurState &prog) {
     gui->set_clear_col({35, 35, 35, 255});
 
     map_gui = std::make_unique<graphics::MapMain>();
-    input_buf.reserve(INPUT_BUF_MAX);
 }
 
 void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx,
@@ -41,19 +40,8 @@ void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx,
 
     map_gui->draw_map(prog);
 
-    if (nk_begin(ctx, "MainWindow", nk_recti(0, 0, 0, 0), NK_WINDOW_BACKGROUND)) {
-    }
-    nk_end(ctx);
-
-    if (nk_begin(ctx, "SubWindow", nk_recti(50, 50, 250, 350),
-            NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE | NK_WINDOW_MOVABLE | NK_WINDOW_BORDER |
-                NK_WINDOW_SCALABLE)) {
-        nk_layout_row_dynamic(ctx, 45, 1);
-        nk_edit_string_zero_terminated(
-            ctx, NK_EDIT_FIELD, input_buf.data(), static_cast<int>(INPUT_BUF_MAX), nk_filter_ascii);
-    }
-
-    nk_end(ctx);
+    task_bar_window.draw(prog, ctx);
+    ap_search_window.draw(prog, ctx);
 }
 
 void GuiMain::on_draw(const xapmap::CurState &prog) {

@@ -431,7 +431,7 @@ bool NkGui::input_event_is_for_nk(const graphics::InputStats &in_stats) noexcept
 
     while (window) {
         // Skip over closed/minimized/inactive windows.
-        if (!nk_window_is_active(&ctx, window->name_string)) {
+        if (nk_window_is_hidden(&ctx, window->name_string)) {
             next_window(window);
             continue;
         }
