@@ -26,8 +26,6 @@ void MapMain::draw_map(const xapmap::CurState &prog) {
         return;
     }
 
-    const auto airport_hdl = get_airport_hdl(prog, map_state.tgt_ident.get_item());
-
-    utils::Log(utils::Log::VERBOSE) << airport_hdl->name << ' ' << airport_hdl->city;
+    // const auto airport_hdl = get_airport_hdl(prog, map_state.tgt_ident.get_item());
 }
 }  // namespace graphics
