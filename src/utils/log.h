@@ -60,14 +60,15 @@ private:
 
 class Log {
 public:
-    enum class LogType : std::uint8_t { Info = 0, Error };
+    enum class LogType : std::uint8_t { Info = 0, Error, Verbose };
     static constexpr auto INFO = LogType::Info;
     static constexpr auto ERROR = LogType::Error;
+    static constexpr auto VERBOSE = LogType::Verbose;
 
     Log(LogType logtype = INFO, SourceLocation slc = SourceLocation::current())
         : out_log(log_stream(logtype)) {
         out_log << LOGGER_HEADER << ' ' << formatted_logtime() << " [" << slc.get_filename() << ':'
-                << slc.get_line() << "]: ";
+                << slc.get_line() << "] " << get_logtype_str(logtype) << ": ";
     }
 
     ~Log() {
@@ -83,9 +84,21 @@ private:
     std::ostream &log_stream(LogType lt) const noexcept {
         switch (lt) {
             case LogType::Info:
+            case LogType::Verbose:
                 return std::cout;
             case LogType::Error:
                 return std::cerr;
+        }
+    }
+
+    constexpr std::string_view get_logtype_str(LogType lt) const noexcept {
+        switch (lt) {
+            case LogType::Info:
+                return "Info";
+            case LogType::Error:
+                return "Error";
+            case LogType::Verbose:
+                return "Verbose";
         }
     }
 
