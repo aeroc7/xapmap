@@ -19,7 +19,7 @@ void TaskBar::draw(const xapmap::CurState &, nk_context *ctx) {
                 WINDOW_HEIGHT),
             NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_static(ctx, 25, dflt::DEFAULT_WINDOW_WIDTH / 8, 6);
-        if (nk_button_text(ctx, "Lookup", 8)) {
+        if (nk_button_label(ctx, "Lookup")) {
             if (nk_window_is_hidden(ctx, AirportSearch::WINDOW_NAME)) {
                 nk_window_show(ctx, AirportSearch::WINDOW_NAME, NK_SHOWN);
             } else {

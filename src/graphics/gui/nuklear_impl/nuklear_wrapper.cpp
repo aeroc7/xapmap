@@ -250,7 +250,8 @@ NkGui::NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback 
     nk_font.height = font_stuff.FONT_SIZE;
     nk_font.width = [](nk_handle hdl, float, const char *text, int len) -> float {
         cairo_text_extents_t te;
-        std::string text_nul_term{text, static_cast<std::size_t>(len)};
+        std::string_view text_view{text, text + len};
+        std::string text_nul_term{text_view};
 
         auto fnt_stuff_ref = reinterpret_cast<FontStuffForNk *>(hdl.ptr);
         fnt_stuff_ref->roboto_fnt.set_font_face(fnt_stuff_ref->last_state->cr);
