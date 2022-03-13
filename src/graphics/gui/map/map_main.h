@@ -9,7 +9,6 @@
 #ifndef MAP_MAIN_H_
 #define MAP_MAIN_H_
 
-#include <parsers/parse_hdlr.h>
 #include <prog_state.h>
 
 namespace graphics {
@@ -20,7 +19,6 @@ public:
 
 private:
     graphics::InputStats input_stats;
-    parsers::ParseHdlr parse_hdlr;
 };
 }  // namespace graphics
 

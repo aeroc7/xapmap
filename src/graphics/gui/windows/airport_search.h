@@ -11,21 +11,21 @@
 
 #include <prog_state.h>
 
-#include <string>
+#include <array>
 
 struct nk_context;
 
 namespace graphics {
 class AirportSearch final {
 public:
-    AirportSearch();
     void draw(const xapmap::CurState &prog, nk_context *ctx);
 
     static constexpr auto WINDOW_NAME = "Airport Lookup";
 
 private:
-    std::string input_buf;
     static constexpr std::size_t INPUT_BUF_MAX = 9;
+    std::array<char, INPUT_BUF_MAX> input_buf{'\0'};
+    bool airport_not_found{false};
 };
 }  // namespace graphics
 

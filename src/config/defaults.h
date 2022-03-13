@@ -13,6 +13,8 @@ namespace dflt {
 constexpr auto DEFAULT_WINDOW_WIDTH = 730;
 constexpr auto DEFAULT_WINDOW_HEIGHT = 420;
 constexpr auto DEFAULT_WINDOW_FPS = 120;
+
+constexpr auto DEFAULT_SINGLE_ROW_HEIGHT = 35;  // px
 }  // namespace dflt
 
 #endif /* DEFAULTS_H_ */
