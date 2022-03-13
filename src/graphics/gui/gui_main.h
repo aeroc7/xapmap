@@ -16,6 +16,7 @@
 #include "map/map_main.h"
 #include "nuklear_impl/nuklear_wrapper.h"
 #include "windows/airport_search.h"
+#include "windows/parse_load.h"
 #include "windows/task_bar.h"
 
 namespace graphics {
@@ -33,6 +34,7 @@ private:
 
     AirportSearch ap_search_window;
     TaskBar task_bar_window;
+    ParseLoad parse_load_window;
 };
 }  // namespace graphics
 

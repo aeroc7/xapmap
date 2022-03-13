@@ -38,10 +38,16 @@ void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx,
         input_events.pop();
     }
 
-    map_gui->draw_map(prog);
+    const bool parse_done = prog.map_conf.parsing_has_finished();
 
-    task_bar_window.draw(prog, ctx);
-    ap_search_window.draw(prog, ctx);
+    if (parse_done) {
+        map_gui->draw_map(prog);
+
+        task_bar_window.draw(prog, ctx);
+        ap_search_window.draw(prog, ctx);
+    } else {
+        parse_load_window.draw(prog, ctx);
+    }
 }
 
 void GuiMain::on_draw(const xapmap::CurState &prog) {

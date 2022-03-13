@@ -11,13 +11,13 @@
 
 #include <cairo/cairo.h>
 #include <config/defaults.h>
+#include <config/map_conf_state.h>
 
 #include <atomic>
 #include <iostream>
 #include <queue>
 
 #include "graphics/window.h"
-#include "map_conf_ui.h"
 
 namespace xapmap {
 class CurState {
@@ -26,7 +26,7 @@ public:
     cairo_t *cr{nullptr};
     std::atomic<int> window_width{dflt::DEFAULT_WINDOW_WIDTH};
     std::atomic<int> window_height{dflt::DEFAULT_WINDOW_HEIGHT};
-    MapConfUi map_conf;
+    mutable MapConfUi map_conf;
 
     void add_cursor_event(graphics::InputStats cs) const {
         std::lock_guard<std::mutex> lock{cursor_mut};

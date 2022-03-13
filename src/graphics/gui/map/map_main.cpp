@@ -9,14 +9,25 @@
 #include "map_main.h"
 
 namespace graphics {
+auto MapMain::get_airport_hdl(const xapmap::CurState &prog, const std::string &icao) {
+    return prog.map_conf.database().ap_database.get_task().value()->get_icao_info(icao).value();
+}
 void MapMain::handle_input_event(const graphics::InputStats &i) {
     input_stats = i;
 }
-void MapMain::draw_map(const xapmap::CurState &) {
-    // const auto ap_db = parse_hdlr.ap_database.get_task().value();
 
-    //     const auto val = parse_hdlr.ap_database.get_task().value();
-    //     std::cout << val->get_icao_info("KSEA").value()->name << '\n';
-    // }
+void MapMain::draw_map(const xapmap::CurState &prog) {
+    if (!prog.map_conf.parsing_has_finished()) {
+        return;
+    }
+
+    const auto &map_state = prog.map_conf.get_latest_state();
+    if (!map_state.tgt_ident.valid()) {
+        return;
+    }
+
+    const auto airport_hdl = get_airport_hdl(prog, map_state.tgt_ident.get_item());
+
+    utils::Log(utils::Log::VERBOSE) << airport_hdl->name << ' ' << airport_hdl->city;
 }
 }  // namespace graphics

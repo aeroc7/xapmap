@@ -6,21 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MAP_MAIN_H_
-#define MAP_MAIN_H_
+#ifndef PARSE_LOAD_H_
+#define PARSE_LOAD_H_
 
 #include <prog_state.h>
 
+struct nk_context;
+
 namespace graphics {
-class MapMain {
+class ParseLoad final {
 public:
-    void handle_input_event(const graphics::InputStats &i);
-    void draw_map(const xapmap::CurState &prog);
+    void draw(const xapmap::CurState &prog, nk_context *ctx);
 
 private:
-    auto get_airport_hdl(const xapmap::CurState &prog, const std::string &icao);
-    graphics::InputStats input_stats;
 };
 }  // namespace graphics
 
-#endif /* MAP_MAIN_H_ */
+#endif /* PARSE_LOAD_H_ */

@@ -14,7 +14,7 @@
 struct nk_context;
 
 namespace graphics {
-class TaskBar {
+class TaskBar final {
 public:
     void draw(const xapmap::CurState &prog, nk_context *ctx);
 

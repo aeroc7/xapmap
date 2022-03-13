@@ -24,7 +24,8 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
         nk_layout_row_dynamic(ctx, dflt::DEFAULT_SINGLE_ROW_HEIGHT, 1);
 
         if (nk_button_label(ctx, "Load")) {
-            if (prog.map_conf.ap_db_set_if_exists(input_buf.data())) {
+            const char *cur_apt = input_buf.data();
+            if (prog.map_conf.ap_db_set_if_exists(cur_apt)) {
                 airport_not_found = false;
                 nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
             } else {
