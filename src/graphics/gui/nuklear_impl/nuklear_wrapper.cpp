@@ -285,7 +285,7 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
          cursor_event = prog.get_cursor_event()) {
         const auto event_data = std::get<graphics::InputStats>(cursor_event);
 
-        auto is_mouse_input = [](graphics::InputStatType t) noexcept {
+        auto is_mouse_input = [](graphics::InputStatType t) {
             if (t == graphics::InputStatType::KEY_INPUT ||
                 t == graphics::InputStatType::KEY_PRESS ||
                 t == graphics::InputStatType::KEY_RELEASE) {
