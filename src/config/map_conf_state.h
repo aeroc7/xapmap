@@ -47,10 +47,15 @@ struct MapState {
 
 class MapConfUi final {
 public:
-    bool ap_db_set_if_exists(const std::string &icao) {
-        if (!parse_hdlr.ap_database.finished()) {
+    bool ap_db_set_if_exists(std::string icao) {
+        if (!parse_hdlr.ap_database.finished() || icao.empty()) {
             return false;
         }
+
+        // Ensure that the input is converted to all uppercase
+        std::transform(icao.begin(), icao.end(), icao.begin(), [](unsigned char c) {
+            return std::toupper(c);
+        });
 
         const auto ap_db = parse_hdlr.ap_database.get_task().value();
         const auto ap_info = ap_db->get_icao_info(icao);
