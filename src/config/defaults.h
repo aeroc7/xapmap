@@ -9,12 +9,16 @@
 #ifndef DEFAULTS_H_
 #define DEFAULTS_H_
 
-namespace dflt {
-constexpr auto DEFAULT_WINDOW_WIDTH = 730;
-constexpr auto DEFAULT_WINDOW_HEIGHT = 420;
-constexpr auto DEFAULT_WINDOW_FPS = 120;
+#include <graphics/gui/nuklear_impl/nuklear_cairo_color.h>
 
-constexpr auto DEFAULT_SINGLE_ROW_HEIGHT = 35;  // px
+namespace dflt {
+constexpr auto WINDOW_WIDTH = 730;
+constexpr auto WINDOW_HEIGHT = 420;
+constexpr auto WINDOW_FPS = 120;
+
+constexpr auto SINGLE_ROW_HEIGHT = 35;  // px
+
+constexpr nk_impl::RgbColor AIRPORT_BOUNDS_COLOR = {255, 255, 255, 255};
 }  // namespace dflt
 
 #endif /* DEFAULTS_H_ */

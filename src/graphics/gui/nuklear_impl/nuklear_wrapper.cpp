@@ -15,31 +15,9 @@
 #include <string>
 #include <tuple>
 
+#include "nuklear_cairo_color.h"
+
 namespace nk_impl {
-class CairoColor {
-public:
-    CairoColor(double r, double g, double b, double a) : r(r), g(g), b(b), a(a) {
-    }
-
-    CairoColor(const nk_color &col) {
-        r = static_cast<double>(col.r) / 255.0;
-        g = static_cast<double>(col.g) / 255.0;
-        b = static_cast<double>(col.b) / 255.0;
-        a = static_cast<double>(col.a) / 255.0;
-    }
-
-    CairoColor(const CairoColor &) = default;
-    CairoColor(CairoColor &&) = default;
-    CairoColor &operator=(const CairoColor &) = default;
-    CairoColor &operator=(CairoColor &&) = default;
-
-    auto get_rgb() const noexcept {
-        return std::tuple{r, g, b, a};
-    }
-
-private:
-    double r, g, b, a;
-};
 namespace {
 constexpr nk_keys input_key_to_nk_key(std::uint_fast32_t key_id) noexcept {
     using it = graphics::InputKeyType;
@@ -76,14 +54,14 @@ constexpr nk_keys input_key_to_nk_key(std::uint_fast32_t key_id) noexcept {
     }
 }
 
-void cairo_clear_surface(cairo_t *cr, CairoColor col) noexcept {
+void cairo_clear_surface(cairo_t *cr, RgbColor col) noexcept {
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
     cairo_paint(cr);
 }
 
 void cairo_nk_rectangle_base(
-    cairo_t *cr, double x, double y, double w, double h, double rounding, CairoColor col) noexcept {
+    cairo_t *cr, double x, double y, double w, double h, double rounding, RgbColor col) noexcept {
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
 
@@ -95,7 +73,7 @@ void cairo_nk_rectangle_base(
 }
 
 void cairo_nk_stroked_rectangle(cairo_t *cr, double x, double y, double w, double h,
-    double rounding, double line_thickness, CairoColor col) noexcept {
+    double rounding, double line_thickness, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_nk_rectangle_base(cr, x, y, w, h, rounding, col);
     cairo_set_line_width(cr, line_thickness);
@@ -104,7 +82,7 @@ void cairo_nk_stroked_rectangle(cairo_t *cr, double x, double y, double w, doubl
 }
 
 void cairo_nk_filled_rectangle(
-    cairo_t *cr, double x, double y, double w, double h, double rounding, CairoColor col) noexcept {
+    cairo_t *cr, double x, double y, double w, double h, double rounding, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_nk_rectangle_base(cr, x, y, w, h, rounding, col);
     cairo_fill(cr);
@@ -112,7 +90,7 @@ void cairo_nk_filled_rectangle(
 }
 
 void cairo_nk_line(cairo_t *cr, double x1, double y1, double x2, double y2, double thickness,
-    CairoColor col) noexcept {
+    RgbColor col) noexcept {
     cairo_save(cr);
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
@@ -123,7 +101,7 @@ void cairo_nk_line(cairo_t *cr, double x1, double y1, double x2, double y2, doub
     cairo_restore(cr);
 }
 
-void cairo_nk_circle_base(cairo_t *cr, double x, double y, double radius, CairoColor col) noexcept {
+void cairo_nk_circle_base(cairo_t *cr, double x, double y, double radius, RgbColor col) noexcept {
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
     cairo_new_sub_path(cr);
@@ -131,8 +109,8 @@ void cairo_nk_circle_base(cairo_t *cr, double x, double y, double radius, CairoC
     cairo_close_path(cr);
 }
 
-void cairo_nk_stroked_circle(cairo_t *cr, double x, double y, double w, double h, double thickness,
-    CairoColor col) noexcept {
+void cairo_nk_stroked_circle(
+    cairo_t *cr, double x, double y, double w, double h, double thickness, RgbColor col) noexcept {
     double r = (w < h ? w : h) / 2.0;
     cairo_save(cr);
     cairo_nk_circle_base(cr, x + r, y + r, r, col);
@@ -142,7 +120,7 @@ void cairo_nk_stroked_circle(cairo_t *cr, double x, double y, double w, double h
 }
 
 void cairo_nk_filled_circle(
-    cairo_t *cr, double x, double y, double w, double h, CairoColor col) noexcept {
+    cairo_t *cr, double x, double y, double w, double h, RgbColor col) noexcept {
     double r = (w < h ? w : h) / 2.0;
     cairo_save(cr);
     cairo_nk_circle_base(cr, x + r, y + r, r, col);
@@ -151,7 +129,7 @@ void cairo_nk_filled_circle(
 }
 
 void cairo_nk_triangle_base(cairo_t *cr, double x1, double y1, double x2, double y2, double x3,
-    double y3, CairoColor col) noexcept {
+    double y3, RgbColor col) noexcept {
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);
     cairo_new_sub_path(cr);
@@ -163,7 +141,7 @@ void cairo_nk_triangle_base(cairo_t *cr, double x1, double y1, double x2, double
 }
 
 void cairo_nk_stroked_triangle(cairo_t *cr, double x1, double y1, double x2, double y2, double x3,
-    double y3, double thickness, CairoColor col) noexcept {
+    double y3, double thickness, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_set_line_width(cr, thickness);
     cairo_nk_triangle_base(cr, x1, y1, x2, y2, x3, y3, col);
@@ -172,7 +150,7 @@ void cairo_nk_stroked_triangle(cairo_t *cr, double x1, double y1, double x2, dou
 }
 
 void cairo_nk_filled_triangle(cairo_t *cr, double x1, double y1, double x2, double y2, double x3,
-    double y3, CairoColor col) noexcept {
+    double y3, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_nk_triangle_base(cr, x1, y1, x2, y2, x3, y3, col);
     cairo_fill(cr);
@@ -180,7 +158,7 @@ void cairo_nk_filled_triangle(cairo_t *cr, double x1, double y1, double x2, doub
 }
 
 void cairo_nk_polygon_base(
-    cairo_t *cr, const struct nk_vec2i *points, std::size_t points_sz, CairoColor col) noexcept {
+    cairo_t *cr, const struct nk_vec2i *points, std::size_t points_sz, RgbColor col) noexcept {
     ASSERT(points_sz > 0);
     ASSERT(points != nullptr);
 
@@ -198,7 +176,7 @@ void cairo_nk_polygon_base(
 }
 
 void cairo_nk_stroked_polygon(cairo_t *cr, const struct nk_vec2i *points, std::size_t points_sz,
-    double thickness, CairoColor col) noexcept {
+    double thickness, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_set_line_width(cr, thickness);
     cairo_nk_polygon_base(cr, points, points_sz, col);
@@ -207,7 +185,7 @@ void cairo_nk_stroked_polygon(cairo_t *cr, const struct nk_vec2i *points, std::s
 }
 
 void cairo_nk_filled_polygon(
-    cairo_t *cr, const struct nk_vec2i *points, std::size_t points_sz, CairoColor col) noexcept {
+    cairo_t *cr, const struct nk_vec2i *points, std::size_t points_sz, RgbColor col) noexcept {
     cairo_save(cr);
     cairo_nk_polygon_base(cr, points, points_sz, col);
     cairo_fill(cr);
@@ -215,7 +193,7 @@ void cairo_nk_filled_polygon(
 }
 
 void cairo_nk_text(cairo_t *cr, utils::CairoFont &font, double x, double y, double sz,
-    const char *text, CairoColor col) noexcept {
+    const char *text, RgbColor col) noexcept {
     cairo_save(cr);
     const auto [r, g, b, a] = col.get_rgb();
     cairo_set_source_rgba(cr, r, g, b, a);

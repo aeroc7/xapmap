@@ -11,6 +11,8 @@
 
 #include <prog_state.h>
 
+#include "map_tk/map_perimeter.h"
+
 namespace graphics {
 class MapMain {
 public:
@@ -20,6 +22,7 @@ public:
 private:
     auto get_airport_hdl(const xapmap::CurState &prog, const std::string &icao);
     graphics::InputStats input_stats;
+    graphics::MapPerimeter perim;
 };
 }  // namespace graphics
 

@@ -13,15 +13,15 @@
 namespace graphics {
 void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
     if (nk_begin(ctx, WINDOW_NAME,
-            nk_recti(dflt::DEFAULT_WINDOW_WIDTH / 4, dflt::DEFAULT_WINDOW_HEIGHT / 4,
-                dflt::DEFAULT_WINDOW_WIDTH / 2, dflt::DEFAULT_WINDOW_HEIGHT / 2),
+            nk_recti(dflt::WINDOW_WIDTH / 4, dflt::WINDOW_HEIGHT / 4, dflt::WINDOW_WIDTH / 2,
+                dflt::WINDOW_HEIGHT / 2),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_DYNAMIC | NK_WINDOW_MOVABLE |
                 NK_WINDOW_CLOSABLE)) {
-        nk_layout_row_dynamic(ctx, dflt::DEFAULT_SINGLE_ROW_HEIGHT, 1);
+        nk_layout_row_dynamic(ctx, dflt::SINGLE_ROW_HEIGHT, 1);
         nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, input_buf.data(),
             static_cast<int>(input_buf.size()), nk_filter_ascii);
         nk_layout_row_dynamic(ctx, 2, 1);
-        nk_layout_row_dynamic(ctx, dflt::DEFAULT_SINGLE_ROW_HEIGHT, 1);
+        nk_layout_row_dynamic(ctx, dflt::SINGLE_ROW_HEIGHT, 1);
 
         if (nk_button_label(ctx, "Load")) {
             const char *cur_apt = input_buf.data();
@@ -35,7 +35,7 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
 
         if (airport_not_found) {
             nk_layout_row_dynamic(ctx, 4, 1);
-            nk_layout_row_dynamic(ctx, dflt::DEFAULT_SINGLE_ROW_HEIGHT / 1.5f, 1);
+            nk_layout_row_dynamic(ctx, dflt::SINGLE_ROW_HEIGHT / 1.5f, 1);
             nk_text_colored(ctx, "Airport not found", 17, NK_TEXT_CENTERED,
                 nk_color{.r = 255, .g = 0, .b = 0, .a = 255});
         }

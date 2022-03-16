@@ -21,7 +21,7 @@ Xapmap::Xapmap() {
         prog.add_cursor_event(cs);
     });
 
-    whdlr.create_window("xapmap", dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT);
+    whdlr.create_window("xapmap", dflt::WINDOW_WIDTH, dflt::WINDOW_HEIGHT);
 
     if (const GLenum err = glewInit(); err != GLEW_OK) {
         throw std::runtime_error(std::string{"Failed to initialize glew: "} +
@@ -29,7 +29,7 @@ Xapmap::Xapmap() {
     }
 
     cairo_mt = std::make_unique<graphics::CairoMt>(
-        dflt::DEFAULT_WINDOW_WIDTH, dflt::DEFAULT_WINDOW_HEIGHT, dflt::DEFAULT_WINDOW_FPS);
+        dflt::WINDOW_WIDTH, dflt::WINDOW_HEIGHT, dflt::WINDOW_FPS);
 
     cairo_mt->set_callbacks(
         [this](cairo_t *cr) {
