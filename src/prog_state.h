@@ -41,7 +41,7 @@ public:
     std::tuple<graphics::InputStats, bool> get_cursor_event() const {
         std::lock_guard<std::mutex> lock{cursor_mut};
         if (cursor_event_q.empty()) {
-            return {{}, false};
+            return {graphics::InputStats{}, false};
         }
 
         graphics::InputStats next_event = cursor_event_q.front();

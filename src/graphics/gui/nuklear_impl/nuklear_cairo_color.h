@@ -19,7 +19,7 @@ struct nk_color;
 namespace nk_impl {
 class RgbColor final {
 public:
-    constexpr RgbColor(double r, double g, double b, double a) : r(r), g(g), b(b), a(a) {
+    constexpr RgbColor(double pr, double pg, double pb, double pa) : r(pr), g(pg), b(pb), a(pa) {
     }
 
     RgbColor(const nk_color &col);

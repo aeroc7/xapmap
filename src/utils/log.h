@@ -89,6 +89,8 @@ private:
             case LogType::Error:
                 return std::cerr;
         }
+
+        return std::cout;
     }
 
     constexpr std::string_view get_logtype_str(LogType lt) const noexcept {
@@ -100,6 +102,8 @@ private:
             case LogType::Verbose:
                 return "Verbose";
         }
+
+        return "Info";
     }
 
     std::ostream &out_log;

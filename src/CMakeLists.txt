@@ -24,6 +24,19 @@ else()
     target_compile_definitions(project_options INTERFACE -DUSER_XPLANE_ROOT="${XPLANE_ROOT}")
 endif()
 
+option(XPLANE_LIBRARY "Build the X-Plane library in addition to the executable")
+# Restrict compiler to not use GCC for library builds (at least for now)
+# In short, GCC uses unique symbols to prevent symbol conflicts
+# with certain global constants in a particular library.
+# This in turn can prevent dlclose() from being called,
+# and we NEED that to be called for our plugin to get a
+# reload without completely restarting X-Plane (only on Linux systems)
+if(UNIX AND NOT APPLE AND XPLANE_LIBRARY)
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        message(FATAL_ERROR "GCC compiler not supported for library builds on this platform")
+    endif()
+endif()
+
 # Various library definitions
 target_compile_definitions(project_options INTERFACE
     -DGLEW_STATIC

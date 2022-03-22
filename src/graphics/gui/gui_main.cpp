@@ -20,9 +20,9 @@ void GuiMain::on_start(const xapmap::CurState &prog) {
             xapmap::CurState::input_event_q_value_type &) {
             set_gui_theme(ctx);
         },
-        [this](const xapmap::CurState &prog, nk_context *ctx,
+        [this](const xapmap::CurState &pprog, nk_context *ctx,
             xapmap::CurState::input_event_q_value_type &e) {
-            gui_callback(prog, ctx, e);
+            gui_callback(pprog, ctx, e);
         });
 
     gui->set_clear_col({35, 35, 35, 255});

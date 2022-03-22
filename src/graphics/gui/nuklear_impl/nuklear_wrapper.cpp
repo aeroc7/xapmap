@@ -52,6 +52,8 @@ constexpr nk_keys input_key_to_nk_key(std::uint_fast32_t key_id) noexcept {
         case it::RIGHT:
             return NK_KEY_RIGHT;
     }
+
+    return NK_KEY_NONE;
 }
 
 void cairo_clear_surface(cairo_t *cr, RgbColor col) noexcept {

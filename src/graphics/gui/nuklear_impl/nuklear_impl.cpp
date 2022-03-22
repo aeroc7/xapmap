@@ -22,6 +22,7 @@
 
 namespace nk_impl::nk_utils {
 double strtod(const char *str, const char **endptr) noexcept {
+    ASSERT(*endptr != nullptr);
     std::string_view str_as_view{str};
     double out_val{};
     auto [ptr, ec] = utils::from_chars<double>(str_as_view.begin(), str_as_view.end(), out_val);

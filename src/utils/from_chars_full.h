@@ -9,7 +9,10 @@
 #ifndef FROM_CHARS_FULL_H_
 #define FROM_CHARS_FULL_H_
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #include <fast_float/fast_float.h>
+#pragma GCC diagnostic pop
 
 #include <charconv>
 
