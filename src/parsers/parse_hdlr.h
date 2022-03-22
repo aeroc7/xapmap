@@ -19,7 +19,6 @@ template <typename Tclass>
 class ParseHdlrWrapper final {
 public:
     std::optional<const Tclass *> get_task() const {
-        ASSERT(parse_task.operator bool());
         if (!finished()) {
             return std::nullopt;
         }
