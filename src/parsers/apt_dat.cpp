@@ -169,6 +169,14 @@ ParseAptDat::ParseAptDat(const std::string &path, const std::atomic_bool &stop)
     }
 }
 
+void ParseAptDat::verify_node_zerod(const LrCbParam &p) const {
+    if (cur_node != NodeOpenType::NONE) {
+        throw ParseError("Node is supposed to be zerod but has a value of " +
+                             std::to_string(static_cast<int>(cur_node)),
+            p.filename, p.line_num);
+    }
+}
+
 std::vector<std::string> ParseAptDat::scenery_directories(const std::string &path) const {
     std::vector<std::string> file_paths;
 
@@ -255,6 +263,46 @@ void ParseAptDat::cur_apt_100(const LrCbParam &p) {
     cur_apt.runways.push_back(std::move(cur_rwy));
 }
 
+// Node
+void ParseAptDat::cur_apt_111(const LrCbParam &p) {
+    switch (cur_node) {
+        case NodeOpenType::AIRPORT_BOUNDARY:
+            cur_apt.bounds.push_back(extract_node(p));
+            break;
+        default:
+            break;
+    }
+}
+
+// Node with ending
+void ParseAptDat::cur_apt_113(const LrCbParam &p) {
+    cur_apt_111(p);
+    clear_cur_node();
+}
+
+// Bezier curve node with ending
+void ParseAptDat::cur_apt_114(const LrCbParam &) {
+    clear_cur_node();
+}
+
+// Airport boundary start
+void ParseAptDat::cur_apt_130(const LrCbParam &p) {
+    verify_node_zerod(p);
+    set_cur_node(NodeOpenType::AIRPORT_BOUNDARY);
+}
+
+CoordPair ParseAptDat::extract_node(const LrCbParam &p) {
+    CoordPair ret;
+    // Ignores row code--that should already be figured out by the caller.
+    // Part 1 should contain the latitude, and part 2 should contain the
+    // longitude.
+
+    ret.lat = num_from_str<double>(split_after_safe(p, 1), p);
+    ret.lon = num_from_str<double>(split_after_safe(p, 2), p);
+
+    return ret;
+}
+
 void ParseAptDat::parse_apt_dat_file(const std::string &file) {
     FileLineReader(
         file + "Earth nav data/apt.dat",
@@ -271,6 +319,18 @@ void ParseAptDat::parse_apt_dat_file(const std::string &file) {
             } else if (str::cmp_equal_sv(row_code_str.str, "1302")) {
                 // Airport metadata
                 cur_apt_1302(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "111")) {
+                // Node
+                cur_apt_111(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "113")) {
+                // Node with implicit close of loop
+                cur_apt_113(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "114")) {
+                // Node with implicit close of loop (with bezier control point)
+                cur_apt_114(p);
+            } else if (str::cmp_equal_sv(row_code_str.str, "130")) {
+                // Airport boundary header
+                cur_apt_130(p);
             } else if (str::cmp_equal_sv(row_code_str.str, "99")) {
                 // End of file, finish up last airport
                 cur_apt_end(p);

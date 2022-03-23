@@ -21,6 +21,8 @@ struct CoordPair {
     double lon;
 };
 
+enum class NodeOpenType : int { AIRPORT_BOUNDARY = 130, NONE = -1 };
+
 // Info for an airport runway. Respective ends have different coords, name.
 // Overall width is the same, as it's the same pavement, just opposite ends.
 struct AirportRunwayData {
@@ -38,6 +40,7 @@ struct AirportData {
     std::string state;
     CoordPair coords;
     std::vector<AirportRunwayData> runways;
+    std::vector<CoordPair> bounds;
 };
 
 struct LrCbParam {
@@ -54,15 +57,29 @@ public:
 private:
     std::vector<std::string> scenery_directories(const std::string &path) const;
     void parse_apt_dat_file(const std::string &e);
+    void verify_node_zerod(const LrCbParam &) const;
+    void clear_cur_node() noexcept {
+        cur_node = NodeOpenType::NONE;
+    }
+    void set_cur_node(NodeOpenType n) noexcept {
+        cur_node = n;
+    }
 
     void cur_apt_start(const LrCbParam &);
     void cur_apt_end(const LrCbParam &);
     void cur_apt_1302(const LrCbParam &);
     void cur_apt_100(const LrCbParam &);
+    void cur_apt_111(const LrCbParam &);
+    void cur_apt_113(const LrCbParam &);
+    void cur_apt_114(const LrCbParam &);
+    void cur_apt_130(const LrCbParam &);
+
+    CoordPair extract_node(const LrCbParam &);
 
     std::unordered_map<std::string, AirportData> airport_db;
     const std::atomic_bool &stop_parsing;
     AirportData cur_apt;
+    NodeOpenType cur_node;
 };
 }  // namespace parsers
 
