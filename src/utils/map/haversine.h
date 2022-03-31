@@ -29,6 +29,11 @@ template <typename T>
     const T c = 2.0 * std::asin(std::sqrt(a));
     return constants::EARTH_RADIUS * c;
 }
+
+template <typename T>
+[[nodiscard]] constexpr T haversine_formula_meters(T lat1, T lon1, T lat2, T lon2) noexcept {
+    return haversine_formula(lat1, lon1, lat2, lon2) * 1000.0;
+}
 }  // namespace utils
 
 #endif /* HAVERSINE_H_ */
