@@ -10,7 +10,9 @@
 #define FROM_CHARS_FULL_H_
 
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <fast_float/fast_float.h>
 #pragma GCC diagnostic pop
 
