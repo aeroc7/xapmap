@@ -9,6 +9,7 @@
 #ifndef APT_DAT_H_
 #define APT_DAT_H_
 
+#include <array>
 #include <atomic>
 #include <optional>
 #include <string>

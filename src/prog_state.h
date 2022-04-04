@@ -26,6 +26,7 @@ public:
     cairo_t *cr{nullptr};
     std::atomic<int> window_width{dflt::WINDOW_WIDTH};
     std::atomic<int> window_height{dflt::WINDOW_HEIGHT};
+    std::atomic<double> window_res_mult{1.0};
     mutable MapConfUi map_conf;
 
     void add_cursor_event(graphics::InputStats cs) const {

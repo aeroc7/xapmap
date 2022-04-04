@@ -11,6 +11,7 @@
 
 #include <GL/glew.h>
 
+#include <array>
 #include <atomic>
 #include <functional>
 

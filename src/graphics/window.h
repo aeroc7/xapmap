@@ -61,6 +61,8 @@ public:
         return {window_width, window_height};
     }
 
+    std::tuple<int, int> query_true_window_dims();
+
     void set_input_cb(InputCbSignature cb) {
         input_cb = cb;
     }
@@ -75,8 +77,10 @@ private:
     static void glfw_char_callback(GLFWwindow *window, unsigned int codepoint) noexcept;
     static void glfw_key_callback(
         GLFWwindow *window, int key, int scancode, int action, int mods) noexcept;
+    static void set_with_click_ratio(Window *win, double &xpos, double &ypos);
     GLFWwindow *window{nullptr};
     int window_width{}, window_height{};
+    int initial_win_width{}, initial_win_height{};
     InputCbSignature input_cb;
 };
 }  // namespace graphics

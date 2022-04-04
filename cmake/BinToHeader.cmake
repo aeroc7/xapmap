@@ -99,7 +99,7 @@ function(BIN2H)
 
     file(WRITE ${BIN2H_HEADER_DIR}/${BIN2H_HEADER_FNAME_NOEXT}.cpp "${declarations}")
 
-    set(headerContent "#ifndef ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n#define ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n\n#include <cstdint>\n\nnamespace bin2h {\nextern const std::uint8_t ${BIN2H_VARIABLE_NAME}[];\nextern const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE;\n}\n\n#endif  // ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_")
+    set(headerContent "#ifndef ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n#define ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_\n\n#include <cstdint>\n#include <cstddef>\n\nnamespace bin2h {\nextern const std::uint8_t ${BIN2H_VARIABLE_NAME}[];\nextern const std::size_t ${BIN2H_VARIABLE_NAME}_SIZE;\n}\n\n#endif  // ${BIN2H_HEADER_FNAME_NOEXT_UP}_H_")
 
     file(WRITE ${BIN2H_HEADER_DIR}/${BIN2H_HEADER_FNAME_NOEXT}.h "${headerContent}")
 endfunction()

@@ -28,8 +28,10 @@ Xapmap::Xapmap() {
                                  reinterpret_cast<const char *>(glewGetErrorString(err)));
     }
 
+    const auto actual_window_dims = whdlr.query_true_window_dims();
+
     cairo_mt = std::make_unique<graphics::CairoMt>(
-        dflt::WINDOW_WIDTH, dflt::WINDOW_HEIGHT, dflt::WINDOW_FPS);
+        std::get<0>(actual_window_dims), std::get<1>(actual_window_dims), dflt::WINDOW_FPS);
 
     cairo_mt->set_callbacks(
         [this](cairo_t *cr) {
@@ -64,6 +66,7 @@ Xapmap::Xapmap() {
         // Safe: atomic variables
         prog.window_width = w;
         prog.window_height = h;
+        prog.window_res_mult = static_cast<double>(h) / static_cast<double>(dflt::WINDOW_HEIGHT);
     });
 }
 

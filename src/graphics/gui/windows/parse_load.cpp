@@ -15,12 +15,12 @@
 constexpr std::string_view window_msg{"Generating airport database... "};
 
 namespace graphics {
-void ParseLoad::draw(const xapmap::CurState &, nk_context *ctx) {
+void ParseLoad::draw(const xapmap::CurState &prog, nk_context *ctx) {
     if (nk_begin(ctx, "Parse Status",
-            nk_recti(dflt::WINDOW_WIDTH / 4, dflt::WINDOW_HEIGHT / 4, dflt::WINDOW_WIDTH / 2,
-                dflt::WINDOW_HEIGHT / 2),
+            nk_recti(prog.window_width / 4, prog.window_height / 4, prog.window_width / 2,
+                prog.window_height / 2),
             NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR)) {
-        nk_layout_row_dynamic(ctx, dflt::WINDOW_WIDTH / 5, 1);
+        nk_layout_row_dynamic(ctx, prog.window_width / 5, 1);
         nk_text(ctx, window_msg.data(), window_msg.length(),
             NK_TEXT_ALIGN_MIDDLE | NK_TEXT_ALIGN_CENTERED);
     }

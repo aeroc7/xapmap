@@ -9,6 +9,9 @@
 #include <utils/from_chars_full.h>
 #include <utils/utils.h>
 
+#include <array>
+#include <string_view>
+
 #define NK_MEMSET std::memset
 #define NK_MEMCPY std::memcpy
 #define NK_SQRT   std::sqrt
@@ -33,10 +36,11 @@ double strtod(const char *str, const char **endptr) noexcept {
 
 char *dtoa(char *str, double n) noexcept {
     std::array<char, 32> buf;
-    auto [ptr, ec] = std::to_chars(buf.begin(), buf.end() - 1, n);
+    auto [ptr, ec] = utils::from_chars<double>(buf.begin(), buf.end() - 1, n);
 
     if (ec == std::errc()) {
-        std::string_view str_buf(buf.begin(), ptr);
+        const long buf_size = ptr - buf.begin();
+        std::string_view str_buf(buf.begin(), static_cast<std::string_view::size_type>(buf_size));
         std::memcpy(str, str_buf.data(), str_buf.size());
         str[str_buf.size()] = '\0';
         return str;

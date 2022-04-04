@@ -63,7 +63,9 @@ public:
             if (index_ctr == index) {
                 const std::string_view::const_iterator new_iter =
                     (cur_is_space ? (str.begin() + (i + 1)) : (str.begin() + i));
-                return ss_return{{new_iter, str.end()}, ss_error::success};
+                const long new_iter_sz = str.end() - new_iter;
+                return ss_return{{new_iter, static_cast<std::string_view::size_type>(new_iter_sz)},
+                    ss_error::success};
             }
         }
 
@@ -96,7 +98,9 @@ public:
                     }
                     return it;
                 }();
-                return ss_return{{new_iter, next_space_pos}, ss_error::success};
+                const long new_iter_sz = next_space_pos - new_iter;
+                return ss_return{{new_iter, static_cast<std::string_view::size_type>(new_iter_sz)},
+                    ss_error::success};
             }
         }
 

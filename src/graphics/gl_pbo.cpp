@@ -8,6 +8,8 @@
 
 #include "gl_pbo.h"
 
+#include <utils/utils.h>
+
 namespace graphics {
 GlPbo::GlPbo(GLsizei w, GLsizei h) : tgt_width(w), tgt_height(h) {
     for (auto &buf : pbo_bufs) {
@@ -20,10 +22,10 @@ GlPbo::GlPbo(GLsizei w, GLsizei h) : tgt_width(w), tgt_height(h) {
     }
 
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[0].id);
-    cur_buf_handle = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA8, tgt_width, tgt_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
+    cur_buf_handle = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
@@ -32,6 +34,7 @@ void GlPbo::set_buffer_data(std::function<void(void *)> cb) noexcept {
         return;
     }
 
+    ASSERT(cur_buf_handle != nullptr);
     cb(cur_buf_handle);
     back_buf_ready = false;
 }
@@ -40,6 +43,7 @@ void GlPbo::bind_front_buffer() noexcept {
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_bufs[front_buf_index].id);
 
     if (!back_buf_ready) {
+        glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         glTexSubImage2D(
             GL_TEXTURE_2D, 0, 0, 0, tgt_width, tgt_height, GL_BGRA, GL_UNSIGNED_BYTE, nullptr);
 

@@ -41,7 +41,9 @@ endif()
 target_compile_definitions(project_options INTERFACE
     -DGLEW_STATIC
     -DM_PI=3.1415926535897932
-    -DLOGGER_HEADER="${CMAKE_PROJECT_NAME}")
+    -DLOGGER_HEADER="${CMAKE_PROJECT_NAME}"
+    -DGL_SILENCE_DEPRECATION
+    )
 
 if(WIN32)
     target_link_libraries(project_libraries
@@ -55,8 +57,13 @@ elseif(UNIX AND NOT APPLE)
         INTERFACE
             -static-libgcc
             -static-libstdc++
+            GL
    )
 elseif(APPLE)
+    target_link_libraries(project_libraries
+        INTERFACE
+            "-framework OpenGL"
+    )
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME}_standalone
@@ -66,7 +73,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_standalone
         project_warnings
         project_libraries
         Threads::Threads
-        GL
         cairo
         freetype
         pixman

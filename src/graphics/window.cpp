@@ -27,12 +27,28 @@ static bool cursor_pos_checks(double xpos, double ypos) noexcept {
 
     return true;
 }
+
+void Window::set_with_click_ratio(Window *win, double &xpos, double &ypos) {
+    const auto [w, h] = win->get_window_dims();
+
+    if (w == 0 || h == 0) {
+        return;
+    }
+
+    const double wratio = w / static_cast<double>(win->initial_win_width);
+    const double hratio = h / static_cast<double>(win->initial_win_height);
+
+    xpos *= wratio;
+    ypos *= hratio;
+}
+
 void Window::glfw_error_callback([[maybe_unused]] int error, const char *description) {
     Log(Log::ERROR) << "glfw error: " << description;
 }
 
 void Window::glfw_cursor_pos_callback(GLFWwindow *window, double xpos, double ypos) noexcept {
     Window *us = static_cast<Window *>(glfwGetWindowUserPointer(window));
+    set_with_click_ratio(us, xpos, ypos);
 
     if (!cursor_pos_checks(xpos, ypos)) {
         return;
@@ -54,6 +70,7 @@ void Window::glfw_cursor_button_callback(GLFWwindow *window, int button, int act
     }
 
     glfwGetCursorPos(window, &xpos, &ypos);
+    set_with_click_ratio(us, xpos, ypos);
     if (!cursor_pos_checks(xpos, ypos)) {
         return;
     }
@@ -143,6 +160,14 @@ Window::Window() {
     }
 }
 
+std::tuple<int, int> Window::query_true_window_dims() {
+    int win_width, win_height;
+    glfwGetFramebufferSize(window, &win_width, &win_height);
+    window_width = win_width;
+    window_height = win_height;
+    return get_window_dims();
+}
+
 void Window::window_loop(std::function<void()> func) {
     if (!func) {
         throw std::runtime_error("Invalid window loop cb passed");
@@ -169,6 +194,9 @@ void Window::window_loop(std::function<void()> func) {
 }
 
 void Window::create_window(const std::string &title, int w, int h) {
+    initial_win_width = w;
+    initial_win_height = h;
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);

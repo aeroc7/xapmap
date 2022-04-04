@@ -12,6 +12,7 @@
 #include <cairo/cairo.h>
 
 #include <stdexcept>
+#include <string>
 
 namespace utils {
 class CairoError : public std::exception {

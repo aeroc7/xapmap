@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <string>
+#include <string_view>
 #include <tuple>
 
 #include "nuklear_cairo_color.h"
@@ -227,15 +228,16 @@ NkGui::NkGui(const xapmap::CurState &prog, ImplCallback style_set, ImplCallback 
     font_stuff.last_state = &prog;
     gui_cb = cb;
     nk_font.userdata = nk_handle_ptr(&font_stuff);
-    nk_font.height = font_stuff.FONT_SIZE;
+    nk_font.height = font_stuff.FONT_SIZE * static_cast<float>(prog.window_res_mult);
     nk_font.width = [](nk_handle hdl, float, const char *text, int len) -> float {
         cairo_text_extents_t te;
-        std::string_view text_view{text, text + len};
+        std::string_view text_view{text, static_cast<std::string_view::size_type>(len)};
         std::string text_nul_term{text_view};
 
         auto fnt_stuff_ref = reinterpret_cast<FontStuffForNk *>(hdl.ptr);
         fnt_stuff_ref->roboto_fnt.set_font_face(fnt_stuff_ref->last_state->cr);
-        cairo_set_font_size(fnt_stuff_ref->last_state->cr, fnt_stuff_ref->FONT_SIZE);
+        cairo_set_font_size(fnt_stuff_ref->last_state->cr,
+            fnt_stuff_ref->FONT_SIZE * fnt_stuff_ref->last_state->window_res_mult);
         cairo_text_extents(fnt_stuff_ref->last_state->cr, text_nul_term.c_str(), &te);
         return static_cast<float>(te.x_advance);
     };
@@ -384,8 +386,9 @@ void NkGui::draw_frame(const xapmap::CurState &prog) {
                 const auto t = reinterpret_cast<const nk_command_text *>(cmd);
                 auto user_font = reinterpret_cast<utils::CairoFont *>(t->font->userdata.ptr);
                 std::string text_nul_term{t->string, static_cast<std::size_t>(t->length)};
-                cairo_nk_text(prog.cr, *user_font, t->x, t->y, font_stuff.FONT_SIZE,
-                    text_nul_term.c_str(), t->foreground);
+                cairo_nk_text(prog.cr, *user_font, t->x, t->y,
+                    font_stuff.FONT_SIZE * prog.window_res_mult, text_nul_term.c_str(),
+                    t->foreground);
                 break;
             }
             default:
