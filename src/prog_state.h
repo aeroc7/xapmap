@@ -27,7 +27,7 @@ public:
     std::atomic<int> window_width{dflt::WINDOW_WIDTH};
     std::atomic<int> window_height{dflt::WINDOW_HEIGHT};
     std::atomic<double> window_res_mult{1.0};
-    mutable MapConfUi map_conf;
+    mutable MapConfUi map_conf{USER_XPLANE_ROOT};
 
     void add_cursor_event(graphics::InputStats cs) const {
         std::lock_guard<std::mutex> lock{cursor_mut};

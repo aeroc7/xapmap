@@ -38,7 +38,7 @@ private:
 
 class ParseHdlr final {
 public:
-    ParseHdlr();
+    ParseHdlr(const std::string &xpdirectory);
 
     ParseHdlrWrapper<ParseAptDat> ap_database;
 };

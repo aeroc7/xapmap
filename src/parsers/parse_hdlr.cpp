@@ -14,8 +14,8 @@
 #include "apt_dat.h"
 
 namespace parsers {
-ParseHdlr::ParseHdlr() {
+ParseHdlr::ParseHdlr(const std::string &xpdirectory) {
     ap_database.parse_task = std::make_unique<ParseTask<ParseAptDat>>();
-    ap_database.parse_task->start("/home/bennett/X-Plane 11/");
+    ap_database.parse_task->start(xpdirectory);
 }
 }  // namespace parsers

@@ -47,8 +47,12 @@ struct MapState {
 
 class MapConfUi final {
 public:
+    MapConfUi(const std::string &path) {
+        parse_hdlr = std::make_unique<parsers::ParseHdlr>(path);
+    }
+
     bool ap_db_set_if_exists(std::string icao) {
-        if (!parse_hdlr.ap_database.finished() || icao.empty()) {
+        if (!parse_hdlr->ap_database.finished() || icao.empty()) {
             return false;
         }
 
@@ -57,7 +61,7 @@ public:
             return std::toupper(c);
         });
 
-        const auto ap_db = parse_hdlr.ap_database.get_task().value();
+        const auto ap_db = parse_hdlr->ap_database.get_task().value();
         const auto ap_info = ap_db->get_icao_info(icao);
 
         if (!ap_info.has_value()) {
@@ -71,7 +75,7 @@ public:
     }
 
     bool parsing_has_finished() const noexcept {
-        return parse_hdlr.ap_database.finished();
+        return parse_hdlr->ap_database.finished();
     }
 
     MapState &modify_state() noexcept {
@@ -83,7 +87,7 @@ public:
     }
 
     const parsers::ParseHdlr &database() const {
-        return parse_hdlr;
+        return *parse_hdlr.get();
     }
 
 private:
@@ -92,7 +96,7 @@ private:
         m.item = std::make_optional<U>(val);
     }
 
-    parsers::ParseHdlr parse_hdlr;
+    std::unique_ptr<parsers::ParseHdlr> parse_hdlr;
     mutable MapState cur_state;
 };
 }  // namespace xapmap
