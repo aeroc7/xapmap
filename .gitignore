@@ -34,3 +34,6 @@
 # Editor files
 .vscode
 build/
+
+# OS-generated files
+.DS_Store

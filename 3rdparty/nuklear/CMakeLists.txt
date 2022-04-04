@@ -7,6 +7,9 @@ include(ExternalProject)
 ExternalProject_Add(nuklear-build
     URL                 ${DEP_NUKLEAR_LOC}
     CONFIGURE_COMMAND   ""
+    PATCH_COMMAND       patch
+                        -u <SOURCE_DIR>/src/nuklear.h
+                        -i ${CMAKE_CURRENT_LIST_DIR}/arm64_support.patch
     BUILD_COMMAND       cd <SOURCE_DIR>/src/ && sh paq.sh
     INSTALL_COMMAND     cp <SOURCE_DIR>/nuklear.h <INSTALL_DIR>/include/nuklear
 )
