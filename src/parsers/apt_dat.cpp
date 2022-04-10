@@ -9,46 +9,18 @@
 #include "apt_dat.h"
 
 #include <utils/from_chars_full.h>
-#include <utils/log.h>
 #include <utils/str_utils.h>
 
 #include <exception>
 #include <fstream>
 #include <typeinfo>
 
+#include "fast_fliner.h"
+#include "parse_except.h"
+
 using namespace utils;
 
 namespace parsers {
-class ParseError : public std::exception {
-public:
-    ParseError(const std::string &str, SourceLocation sl = SourceLocation::current()) {
-        write_msg(str, sl);
-    }
-
-    ParseError(const std::string &str, const std::string &filename, std::size_t line_num,
-        SourceLocation sl = SourceLocation::current()) {
-        write_msg_w_fninfo(str, filename, line_num, sl);
-    }
-
-    const char *what() const noexcept {
-        return msg.c_str();
-    }
-
-private:
-    void write_msg(const std::string &s, const SourceLocation &sl) {
-        msg = "\nErr Info: " + s + "\nSource Loc: " + sl.get_filename() + ":" + sl.get_function() +
-              ":" + std::to_string(sl.get_line());
-    }
-
-    void write_msg_w_fninfo(const std::string &str, const std::string &filename,
-        std::size_t file_linenum, const SourceLocation &sl) {
-        write_msg(str, sl);
-        msg += "\nFile: " + filename + ":" + std::to_string(file_linenum);
-    }
-
-    std::string msg;
-};
-
 static inline void only_raise_info(const ParseError &e) {
     Log(Log::ERROR) << "Parse error: " << e.what();
 }
@@ -126,32 +98,16 @@ public:
 
 private:
     void read_file(const std::string &path) const {
-        std::ifstream file{path};
-        std::string line_buf;
-        line_buf.reserve(LINE_BUF_SIZE_INIT);
-        std::size_t line_counter{};
+        parsers::FastFliner flr(
+            path,
+            [this](const parsers::LineData &data) {
+                this->user_cb(data);
+            },
+            stop_parsing);
+    }
 
-        if (!file) {
-            throw ParseError("Failed to open file: " + path);
-        }
-
-        while (std::getline(file, line_buf)) {
-            if (stop_parsing) [[unlikely]] {
-                return;
-            }
-
-            line_counter += 1;
-            on_line(LrCbParam{
-                .line = line_buf, .line_num = line_counter, .filename = this->file_basename});
-        }
-
-        if (file.eof()) {
-            return;
-        } else if (file.bad()) {
-            throw ParseError("I/O error while reading file " + path);
-        } else if (file.fail()) {
-            throw ParseError("I/O stream read failed " + path);
-        }
+    void user_cb(const parsers::LineData &data) const {
+        on_line(LrCbParam{data.line_data, data.line_number, "ASDASD"});
     }
 
     Lambda on_line;
@@ -191,7 +147,7 @@ std::vector<std::string> ParseAptDat::scenery_directories(const std::string &pat
                     case str::ss_error::out_of_range:
                         only_raise_info(ParseError(
                             "Attempted string split-to-end is out of range (line contents: '" +
-                                p.line + "')",
+                                std::string(p.line) + "')",
                             p.filename, p.line_num));
                         return;
                     case str::ss_error::str_empty:

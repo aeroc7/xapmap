@@ -20,7 +20,7 @@ void ParseLoad::draw(const xapmap::CurState &prog, nk_context *ctx) {
             nk_recti(prog.window_width / 4, prog.window_height / 4, prog.window_width / 2,
                 prog.window_height / 2),
             NK_WINDOW_BORDER | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR)) {
-        nk_layout_row_dynamic(ctx, prog.window_width / 5, 1);
+        nk_layout_row_dynamic(ctx, static_cast<float>(prog.window_width) / 5.0f, 1);
         nk_text(ctx, window_msg.data(), window_msg.length(),
             NK_TEXT_ALIGN_MIDDLE | NK_TEXT_ALIGN_CENTERED);
     }

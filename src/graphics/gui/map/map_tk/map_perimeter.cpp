@@ -11,10 +11,23 @@
 #include <config/defaults.h>
 
 namespace graphics {
-void line_between(
-    const xapmap::CurState &, const parsers::CoordPair &, const parsers::CoordPair &) noexcept {
+void MapPerimeter::line_between(const xapmap::CurState &prog, const parsers::CoordPair &,
+    const parsers::CoordPair &) const noexcept {
+    const auto [r, g, b, a] = dflt::AIRPORT_BOUNDS_COLOR.get_rgb();
+
+    cairo_set_source_rgba(prog.cr, r, g, b, a);
 }
 
-void MapPerimeter::internal_draw(const xapmap::CurState &, const parsers::AirportData &) {
+void MapPerimeter::internal_draw(const xapmap::CurState &prog, const parsers::AirportData &aptd) {
+    const auto bounds_sz = aptd.bounds.size();
+    if (bounds_sz <= 1) {
+        throw std::runtime_error("No valid bounds for the airport " + aptd.name);
+    }
+
+    for (std::size_t i = 0; i < (bounds_sz - 1); ++i) {
+        line_between(prog, aptd.bounds[i], aptd.bounds[i + 1]);
+    }
+    // Note: first point is both starting and ending location
+    line_between(prog, aptd.bounds[bounds_sz - 1], aptd.bounds[0]);
 }
 }  // namespace graphics

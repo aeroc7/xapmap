@@ -45,7 +45,7 @@ struct AirportData {
 };
 
 struct LrCbParam {
-    const std::string &line;
+    std::string_view line;
     std::size_t line_num;
     const std::string &filename;
 };
