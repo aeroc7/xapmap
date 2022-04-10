@@ -18,8 +18,6 @@ class TaskBar final {
 public:
     void draw(const xapmap::CurState &prog, nk_context *ctx);
 
-    static constexpr auto WINDOW_HEIGHT = 35;
-
 private:
 };
 }  // namespace graphics

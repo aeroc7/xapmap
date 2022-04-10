@@ -16,11 +16,13 @@ namespace graphics {
 void TaskBar::draw(const xapmap::CurState &prog, nk_context *ctx) {
     const auto true_single_row_h = static_cast<int>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult);
     if (nk_begin(ctx, "Taskbar",
-
             nk_recti(
                 0, prog.window_height - true_single_row_h, prog.window_width, true_single_row_h),
             NK_WINDOW_NO_SCROLLBAR)) {
-        nk_layout_row_static(ctx, static_cast<float>(true_single_row_h), prog.window_width / 6, 5);
+        nk_layout_row_static(ctx,
+            static_cast<float>(true_single_row_h) /
+                (1.25f * static_cast<float>(prog.window_res_mult)),
+            prog.window_width / 6, 5);
         if (nk_button_label(ctx, "Lookup")) {
             if (nk_window_is_hidden(ctx, AirportSearch::WINDOW_NAME)) {
                 nk_window_show(ctx, AirportSearch::WINDOW_NAME, NK_SHOWN);
