@@ -14,9 +14,8 @@ namespace graphics {
 ErrorWindowBegin::ErrorWindowBegin(
     const xapmap::CurState &prog, nk_context *ctx, const std::string &error_msg) {
     if (nk_begin(ctx, NAME,
-            nk_recti(prog.window_width / 4, prog.window_height / 4,
-                static_cast<int>(WIDTH * prog.window_res_mult),
-                static_cast<int>(HEIGHT * prog.window_res_mult)),
+            nk_recti(prog.window_width / 4, prog.window_height / 4, prog.window_width / 2,
+                static_cast<int>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) * 4),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_CLOSABLE | NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_dynamic(
             ctx, static_cast<float>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) * 1.5f, 1);

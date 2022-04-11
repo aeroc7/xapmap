@@ -18,8 +18,6 @@ struct nk_context;
 namespace graphics {
 class ErrorWindowBegin final {
 public:
-    static constexpr auto WIDTH = dflt::SINGLE_ROW_HEIGHT * 8;
-    static constexpr auto HEIGHT = dflt::SINGLE_ROW_HEIGHT * 3;
     static constexpr auto NAME = "Error";
 
     ErrorWindowBegin(const xapmap::CurState &prog, nk_context *ctx, const std::string &error_msg);
