@@ -10,13 +10,20 @@
 
 #include <graphics/gui/nuklear_impl/nuklear_include.h>
 
+#include "error_window.h"
+
 namespace graphics {
 void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
+    if (airport_not_found || !nk_window_is_hidden(ctx, ErrorWindowBegin::NAME)) {
+        ErrorWindowBegin no_ap_found{prog, ctx, "Airport not found!"};
+        airport_not_found = false;
+    }
+
     if (nk_begin(ctx, WINDOW_NAME,
             nk_recti(prog.window_width / 4, prog.window_height / 4, prog.window_width / 2,
-                prog.window_height / 2),
-            NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_DYNAMIC | NK_WINDOW_MOVABLE |
-                NK_WINDOW_CLOSABLE)) {
+                static_cast<int>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) * 4),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE |
+                NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_dynamic(
             ctx, static_cast<float>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult), 1);
         nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, input_buf.data(),
@@ -29,18 +36,10 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
             const char *cur_apt = input_buf.data();
             if (prog.map_conf.ap_db_set_if_exists(cur_apt)) {
                 airport_not_found = false;
-                nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
+                // nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
             } else {
                 airport_not_found = true;
             }
-        }
-
-        if (airport_not_found) {
-            nk_layout_row_dynamic(ctx, 4, 1);
-            nk_layout_row_dynamic(
-                ctx, static_cast<float>((dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) / 1.5), 1);
-            nk_text_colored(ctx, "Airport not found", 17, NK_TEXT_CENTERED,
-                nk_color{.r = 255, .g = 0, .b = 0, .a = 255});
         }
     }
 
