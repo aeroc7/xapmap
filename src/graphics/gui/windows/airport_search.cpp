@@ -27,7 +27,8 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
                 NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_dynamic(
             ctx, static_cast<float>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult), 1);
-        nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, input_buf.data(),
+        nk_edit_string_zero_terminated(ctx,
+            NK_EDIT_FIELD | static_cast<nk_edit_types>(NK_EDIT_SIG_ENTER), input_buf.data(),
             static_cast<int>(input_buf.size()), nk_filter_ascii);
         nk_layout_row_dynamic(ctx, 2, 1);
         nk_layout_row_dynamic(
@@ -37,8 +38,13 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
             const char *cur_apt = input_buf.data();
             if (prog.map_conf.ap_db_set_if_exists(cur_apt)) {
                 airport_not_found = false;
-                // nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
+                nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
+
+                for (auto &c : input_buf) {
+                    c = '\0';
+                }
             } else {
+                nk_window_show(ctx, WINDOW_NAME, NK_SHOWN);
                 airport_not_found = true;
             }
         }
