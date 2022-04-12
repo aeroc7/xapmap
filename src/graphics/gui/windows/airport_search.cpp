@@ -21,7 +21,8 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
 
     if (nk_begin(ctx, WINDOW_NAME,
             nk_recti(prog.window_width / 4, prog.window_height / 4, prog.window_width / 2,
-                static_cast<int>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) * 4),
+                static_cast<int>(
+                    static_cast<float>(dflt::SINGLE_ROW_HEIGHT * prog.window_res_mult) * 3.75f)),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE |
                 NK_WINDOW_NO_SCROLLBAR)) {
         nk_layout_row_dynamic(
