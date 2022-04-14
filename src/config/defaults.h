@@ -19,6 +19,8 @@ constexpr auto WINDOW_FPS = 120;
 constexpr auto SINGLE_ROW_HEIGHT = 35;  // px
 
 constexpr nk_impl::RgbColor AIRPORT_BOUNDS_COLOR = {255, 255, 255, 255};
+
+constexpr auto AIRPORT_MAP_PIXEL_PER_METER_DEFAULT = 0.5;
 }  // namespace dflt
 
 #endif /* DEFAULTS_H_ */

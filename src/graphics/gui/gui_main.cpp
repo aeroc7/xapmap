@@ -27,7 +27,7 @@ void GuiMain::on_start(const xapmap::CurState &prog) {
 
     gui->set_clear_col({35, 35, 35, 255});
 
-    map_gui = std::make_unique<graphics::MapMain>();
+    map_gui = std::make_unique<graphics::MapMain>(prog);
 }
 
 void GuiMain::gui_callback(const xapmap::CurState &prog, nk_context *ctx,

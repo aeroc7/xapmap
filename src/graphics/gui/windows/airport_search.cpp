@@ -40,6 +40,7 @@ void AirportSearch::draw(const xapmap::CurState &prog, nk_context *ctx) {
                 airport_not_found = false;
                 nk_window_show(ctx, WINDOW_NAME, NK_HIDDEN);
 
+                // Clear input buffer
                 for (auto &c : input_buf) {
                     c = '\0';
                 }
