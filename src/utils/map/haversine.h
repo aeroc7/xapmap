@@ -22,7 +22,7 @@ template <typename T>
     const auto rlon = deg_to_rad<T>(lon2 - lon1);
 
     lat1 = deg_to_rad<T>(lat1);
-    lon1 = deg_to_rad<T>(lon1);
+    lat2 = deg_to_rad<T>(lat2);
 
     const T a = std::pow<T>(std::sin(rlat / 2.0), 2) +
                 std::pow<T>(std::sin(rlon / 2.0), 2) * std::cos(lat1) * std::cos(lat2);
